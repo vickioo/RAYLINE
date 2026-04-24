@@ -6,7 +6,7 @@ export default function ThinkingBlock({ text, isThinking }) {
   const [open, setOpen] = useState(false);
   const s = useFontScale();
   const hasText = Boolean(text && text.trim().length > 0);
-  const startTime = useRef(Date.now());
+  const startTime = useRef(null); // lazy: set inside effect to keep render pure
   const [elapsed, setElapsed] = useState(0);
 
   // Track thinking duration
@@ -27,6 +27,7 @@ export default function ThinkingBlock({ text, isThinking }) {
     }
   }, [isThinking, elapsed]);
 
+  // eslint-disable-next-line react-hooks/refs -- freeze-on-stop display idiom: reading frozen value after thinking stops is intentional
   const seconds = isThinking ? elapsed : (finalElapsed.current || elapsed);
 
   function formatDuration(s) {

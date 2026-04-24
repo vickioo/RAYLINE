@@ -37,6 +37,7 @@ export default function SearchableSelect({ options, value, onChange, placeholder
 
   // Reset highlight when filtered list changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- cross-prop sync: highlight index must snap to 0 whenever filter changes; user also moves it via arrow keys, so it can't be pure-derived
     setHighlightIdx(0);
   }, [filtered.length]);
 

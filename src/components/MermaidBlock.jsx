@@ -178,6 +178,7 @@ export default function MermaidBlock({ code }) {
         fontSize: s(11),
         fontFamily: "'JetBrains Mono',monospace",
         // Preserve last known height to prevent scroll jumps
+        // eslint-disable-next-line react-hooks/refs -- layout-stability idiom: read last measured height to avoid scroll jump on re-render
         minHeight: lastHeight.current || undefined,
         display: "flex",
         alignItems: "center",

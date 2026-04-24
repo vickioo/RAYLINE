@@ -44,6 +44,7 @@ export function useMulticaModels() {
     } finally { setLoading(false); }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- external data sync: fetch agents from multica server on mount
   useEffect(() => { void refresh(); }, [refresh]);
 
   useEffect(() => {

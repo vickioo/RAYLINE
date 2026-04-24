@@ -143,6 +143,7 @@ export default function LoadingStatus({ startedAt, elapsedMs: frozenElapsedMs, u
   // reloads, whereas `Date.now() - _startedAt` would drift across sessions.
   const elapsedMs = isStreaming
     ? (startedAt ? now - startedAt : 0)
+    // eslint-disable-next-line react-hooks/refs -- freeze-on-stop: final elapsed captured at stream end, read once on render after streaming
     : (frozenElapsedMs ?? finalElapsedRef.current ?? 0);
 
   const model = modelId ? getM(modelId) : null;
