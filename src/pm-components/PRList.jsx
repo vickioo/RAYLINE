@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { GitPullRequest, GitMerge, GitPullRequestClosed, Copy, Check, GitBranch } from "lucide-react";
 import { applyPaneInteractionStyle, getPaneInteractionStyle } from "../utils/paneSurface";
 import HoverIconButton from "../components/HoverIconButton";
 import { createTranslator } from "../i18n";
+import useOptimisticList from "./hooks/useOptimisticList";
 
 function timeAgo(dateStr, t) {
   const now = Date.now();
@@ -20,67 +21,17 @@ function timeAgo(dateStr, t) {
 
 export default function PRList({ repos, stateFilter, repoFilter, onSelectItem, refreshSignal, freshItem, locale = "en-US" }) {
   const t = createTranslator(locale);
-  const [prs, setPrs] = useState([]);
-  const [initialLoad, setInitialLoad] = useState(true);
-  const [error, setError] = useState(null);
   const [copiedAction, setCopiedAction] = useState(null);
 
-  async function fetchPRs({ silent = false } = {}) {
-    if (!silent) setInitialLoad(true);
-    setError(null);
-    try {
-      const targetRepos = repoFilter ? [repoFilter] : repos;
-      const results = await Promise.all(
-        targetRepos.map(async (repo) => {
-          const items = await window.ghApi.listPRs(repo, stateFilter);
-          return items.map((item) => ({ ...item, _repo: repo }));
-        })
-      );
-      const merged = results.flat().sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-      );
-      setPrs((prev) => {
-        const mergedKeys = new Set(merged.map((i) => `${i._repo}-${i.number}`));
-        const stillPending = prev.filter(
-          (i) => i.__optimistic && !mergedKeys.has(`${i._repo}-${i.number}`)
-        );
-        return [...stillPending, ...merged].sort(
-          (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        );
-      });
-    } catch (err) {
-      setError(err.message || t("pm.failedToLoadPullRequests"));
-    } finally {
-      setInitialLoad(false);
-    }
-  }
-
-  useEffect(() => {
-    if (repos.length === 0) {
-      setPrs([]);
-      setInitialLoad(false);
-      return;
-    }
-    fetchPRs({ silent: !initialLoad });
-    const interval = setInterval(() => {
-      fetchPRs({ silent: true }).catch(() => {});
-    }, 30000);
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [repos, stateFilter, repoFilter, refreshSignal]);
-
-  useEffect(() => {
-    if (!freshItem || freshItem.number == null) return;
-    const itemState = freshItem.state || "open";
-    if (itemState !== stateFilter) return;
-    if (repoFilter && freshItem._repo !== repoFilter) return;
-    if (!repos.includes(freshItem._repo)) return;
-    setPrs((prev) => {
-      const key = `${freshItem._repo}-${freshItem.number}`;
-      if (prev.some((i) => `${i._repo}-${i.number}` === key)) return prev;
-      return [{ ...freshItem, __optimistic: true }, ...prev];
-    });
-  }, [freshItem, stateFilter, repoFilter, repos]);
+  const { items: prs, initialLoad, error, refetch } = useOptimisticList({
+    repos,
+    stateFilter,
+    repoFilter,
+    refreshSignal,
+    freshItem,
+    fetcher: (repo, state) => window.ghApi.listPRs(repo, state),
+    errorFallbackMessage: t("pm.failedToLoadPullRequests"),
+  });
 
   if (initialLoad && prs.length === 0) {
     return (
@@ -95,7 +46,7 @@ export default function PRList({ repos, stateFilter, repoFilter, onSelectItem, r
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: 40, gap: 12 }}>
         <span style={{ color: "rgba(255,100,100,0.7)", fontFamily: "system-ui", fontSize: 13 }}>{error}</span>
         <button
-          onClick={() => fetchPRs()}
+          onClick={() => refetch()}
           style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6, color: "rgba(255,255,255,0.5)", padding: "6px 16px", cursor: "pointer", fontFamily: "system-ui", fontSize: 12 }}
         >
           {t("pm.retry")}
