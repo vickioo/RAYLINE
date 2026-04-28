@@ -389,7 +389,7 @@ const cardStyle = {
   WebkitBackdropFilter: "blur(48px) saturate(1.2)",
   border: "1px solid var(--border)",
   borderRadius: 12, display: "flex", flexDirection: "column",
-  color: "var(--text-primary)", fontFamily: "system-ui, sans-serif", fontSize: 13,
+  color: "var(--text-primary)", fontFamily: "var(--font-ui)", fontSize: 13,
   boxShadow: "var(--shadow-md)",
 };
 const headerStyle = {

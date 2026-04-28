@@ -136,6 +136,7 @@ contextBridge.exposeInMainWorld("api", {
 
   // Window appearance
   setWindowOpacity: (opacity) => ipcRenderer.invoke("set-window-opacity", opacity),
+  setWindowBackgroundColor: (color) => ipcRenderer.invoke("set-window-background-color", color),
   writeClipboardImage: (dataUrl) => ipcRenderer.invoke("clipboard-write-image", dataUrl),
 
   // multica

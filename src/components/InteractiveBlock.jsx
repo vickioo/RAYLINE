@@ -17,9 +17,25 @@ function getResolvedThemeMode(detail) {
   return "dark";
 }
 
+function readRootCssVar(name, fallback) {
+  if (typeof document === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
+
+function getInteractiveTokens(resolvedMode = getResolvedThemeMode()) {
+  const light = resolvedMode === "light";
+  return {
+    bg: readRootCssVar("--bg-primary", light ? "#ffffff" : "#0d0d10"),
+    fg: readRootCssVar("--text-primary", light ? "rgba(15,23,42,0.78)" : "rgba(255,255,255,0.75)"),
+    line: readRootCssVar("--border-strong", light ? "rgba(15,23,42,0.18)" : "rgba(255,255,255,0.15)"),
+    fontUi: readRootCssVar("--font-ui", "system-ui, -apple-system, sans-serif"),
+  };
+}
+
 export default function InteractiveBlock({ code, isStreaming }) {
   const s = useFontScale();
   const [resolvedMode] = useState(() => getResolvedThemeMode());
+  const tokens = getInteractiveTokens(resolvedMode);
 
   // While streaming, show a generating placeholder
   if (isStreaming) {
@@ -27,8 +43,8 @@ export default function InteractiveBlock({ code, isStreaming }) {
       <div style={{
         margin: "12px 0",
         borderRadius: 10,
-        border: "1px solid rgba(255,255,255,0.06)",
-        background: "#0a0a0a",
+        border: "1px solid var(--code-border)",
+        background: "var(--code-bg)",
         padding: "24px",
         display: "flex",
         flexDirection: "column",
@@ -41,14 +57,14 @@ export default function InteractiveBlock({ code, isStreaming }) {
           size={16}
           strokeWidth={1.5}
           style={{
-            color: "rgba(255,255,255,0.2)",
+            color: "var(--text-disabled)",
             animation: "spin 1s linear infinite",
           }}
         />
         <span style={{
           fontSize: s(9),
-          fontFamily: "'JetBrains Mono',monospace",
-          color: "rgba(255,255,255,0.2)",
+          fontFamily: "var(--font-mono)",
+          color: "var(--text-disabled)",
           letterSpacing: ".1em",
         }}>
           GENERATING VISUALIZATION
@@ -65,9 +81,10 @@ export default function InteractiveBlock({ code, isStreaming }) {
 <style>
   :root {
     color-scheme: ${resolvedMode};
-    --bg: ${resolvedMode === "light" ? "#ffffff" : "#0a0a0a"};
-    --fg: ${resolvedMode === "light" ? "rgba(15,23,42,0.78)" : "rgba(255,255,255,0.75)"};
-    --line: ${resolvedMode === "light" ? "rgba(15,23,42,0.18)" : "rgba(255,255,255,0.15)"};
+    --bg: ${tokens.bg};
+    --fg: ${tokens.fg};
+    --line: ${tokens.line};
+    --font-ui: ${tokens.fontUi};
   }
   :root[data-theme="light"] {
     color-scheme: light;
@@ -77,7 +94,7 @@ export default function InteractiveBlock({ code, isStreaming }) {
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #0a0a0a;
+    --bg: #0d0d10;
     --fg: rgba(255,255,255,0.75);
     --line: rgba(255,255,255,0.15);
   }
@@ -86,7 +103,7 @@ export default function InteractiveBlock({ code, isStreaming }) {
     margin: 0; padding: 12px;
     background: var(--bg);
     color: var(--fg);
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: var(--font-ui);
     font-size: 14px;
     overflow: hidden;
   }
@@ -97,14 +114,20 @@ export default function InteractiveBlock({ code, isStreaming }) {
 <body>
 ${code}
 <script>
-  function applyTheme(resolved) {
+  function applyTheme(resolved, tokens) {
     if (resolved !== 'light' && resolved !== 'dark') return;
     document.documentElement.dataset.theme = resolved;
+    if (tokens && typeof tokens === 'object') {
+      if (tokens.bg) document.documentElement.style.setProperty('--bg', tokens.bg);
+      if (tokens.fg) document.documentElement.style.setProperty('--fg', tokens.fg);
+      if (tokens.line) document.documentElement.style.setProperty('--line', tokens.line);
+      if (tokens.fontUi) document.documentElement.style.setProperty('--font-ui', tokens.fontUi);
+    }
     postHeight();
   }
   window.addEventListener('message', (event) => {
     if (event.data?.type === 'rayline:theme') {
-      applyTheme(event.data.resolved);
+      applyTheme(event.data.resolved, event.data.tokens);
     }
   });
 
@@ -125,14 +148,14 @@ ${code}
       margin: "12px 0",
       borderRadius: 10,
       overflow: "hidden",
-      border: "1px solid rgba(255,255,255,0.06)",
-      background: "#0a0a0a",
+      border: "1px solid var(--code-border)",
+      background: "var(--code-bg)",
       position: "relative",
     }}>
       <div style={{
         fontSize: s(8),
-        fontFamily: "'JetBrains Mono',monospace",
-        color: "rgba(255,255,255,0.2)",
+        fontFamily: "var(--font-mono)",
+        color: "var(--text-disabled)",
         letterSpacing: ".1em",
         padding: "6px 10px 0",
       }}>
@@ -161,11 +184,15 @@ function IframeRenderer({ srcdoc }) {
   useEffect(() => {
     const handleThemeChange = (event) => {
       const resolved = getResolvedThemeMode(event.detail);
-      iframeRef.current?.contentWindow?.postMessage({ type: "rayline:theme", resolved }, "*");
+      iframeRef.current?.contentWindow?.postMessage({ type: "rayline:theme", resolved, tokens: getInteractiveTokens(resolved) }, "*");
     };
 
     window.addEventListener("rayline:theme-change", handleThemeChange);
-    return () => window.removeEventListener("rayline:theme-change", handleThemeChange);
+    window.addEventListener("rayline:appearance-change", handleThemeChange);
+    return () => {
+      window.removeEventListener("rayline:theme-change", handleThemeChange);
+      window.removeEventListener("rayline:appearance-change", handleThemeChange);
+    };
   }, []);
 
   return (

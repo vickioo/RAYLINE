@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import TerminalDrawer from "./components/TerminalDrawer";
 import useTerminal from "./hooks/useTerminal";
+import { useTheme } from "./contexts/ThemeContext.jsx";
+import { applyAppearanceToDocument, getAppearanceProfile, normalizeAppearance } from "./utils/appearance";
 import { getWallpaperImageFilter, normalizeWallpaper } from "./utils/wallpaper";
+
+function isSameJsonValue(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
 
 export default function TerminalWindow() {
   const terminal = useTerminal();
+  const { resolved: resolvedTheme } = useTheme();
   const {
     sessions,
     activeSession,
@@ -15,6 +22,7 @@ export default function TerminalWindow() {
   } = terminal;
   const announcedReadyRef = useRef(false);
   const [wallpaper, setWallpaper] = useState(null);
+  const [appearance, setAppearance] = useState(() => normalizeAppearance());
   const [hasLoadedWallpaper, setHasLoadedWallpaper] = useState(false);
 
   const nudgeActiveTerminalLayout = useCallback(() => {
@@ -30,17 +38,26 @@ export default function TerminalWindow() {
 
     try {
       const state = await window.api.loadState();
+      const nextAppearance = normalizeAppearance(state?.appearance);
+      setAppearance((current) => (
+        isSameJsonValue(current, nextAppearance) ? current : nextAppearance
+      ));
       const nextWallpaper = normalizeWallpaper(state?.wallpaper);
       if (!nextWallpaper) {
-        setWallpaper(null);
+        setWallpaper((current) => (current === null ? current : null));
         return;
       }
 
       if (nextWallpaper.path && window.api?.readImage) {
         const dataUrl = await window.api.readImage(nextWallpaper.path);
-        setWallpaper(normalizeWallpaper({ ...nextWallpaper, dataUrl: dataUrl || null }));
+        const normalizedWallpaper = normalizeWallpaper({ ...nextWallpaper, dataUrl: dataUrl || null });
+        setWallpaper((current) => (
+          isSameJsonValue(current, normalizedWallpaper) ? current : normalizedWallpaper
+        ));
       } else {
-        setWallpaper(nextWallpaper);
+        setWallpaper((current) => (
+          isSameJsonValue(current, nextWallpaper) ? current : nextWallpaper
+        ));
       }
     } catch (error) {
       console.error("[TerminalWindow] failed to load visual state:", error);
@@ -49,6 +66,18 @@ export default function TerminalWindow() {
       setHasLoadedWallpaper(true);
     }
   }, []);
+
+  useEffect(() => {
+    const normalizedAppearance = normalizeAppearance(appearance);
+    const profile = getAppearanceProfile(normalizedAppearance, resolvedTheme);
+    applyAppearanceToDocument(normalizedAppearance, resolvedTheme);
+
+    const windowBackground = profile.palette.pane;
+    document.documentElement.style.backgroundColor = windowBackground;
+    document.body.style.backgroundColor = windowBackground;
+    document.getElementById("root")?.style.setProperty("background-color", windowBackground);
+    window.api?.setWindowBackgroundColor?.(windowBackground);
+  }, [appearance, resolvedTheme]);
 
   useEffect(() => {
     const handleFocus = () => {

@@ -67,7 +67,7 @@ export default function HoverIconButton({
             borderRadius: 4,
             color: "var(--text-primary)",
             fontSize: 9,
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             letterSpacing: ".04em",
             whiteSpace: "nowrap",
             pointerEvents: "none",

@@ -214,7 +214,7 @@ export default function LoadingStatus({ startedAt, elapsedMs: frozenElapsedMs, u
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         fontSize: s(11),
         letterSpacing: ".02em",
         lineHeight: 1.55,

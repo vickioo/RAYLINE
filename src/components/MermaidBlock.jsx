@@ -6,6 +6,11 @@ let mermaidInitialized = false;
 let mermaidMode = null;
 let renderCounter = 0;
 
+function readRootCssVar(name, fallback) {
+  if (typeof document === "undefined") return fallback;
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+}
+
 const DARK_THEME_VARIABLES = {
   darkMode: true,
   background: "#0a0a0a",
@@ -88,7 +93,7 @@ const DARK_THEME_VARIABLES = {
   classText: "rgba(255,255,255,0.8)",
 
   // Font
-  fontFamily: "system-ui,-apple-system,sans-serif",
+  fontFamily: "var(--font-ui)",
   fontSize: "13px",
 };
 
@@ -174,7 +179,7 @@ const LIGHT_THEME_VARIABLES = {
   classText: "#1f2937",
 
   // Font
-  fontFamily: "system-ui,-apple-system,sans-serif",
+  fontFamily: "var(--font-ui)",
   fontSize: "13px",
 };
 
@@ -184,13 +189,77 @@ function getThemeMode() {
   return root.dataset.theme === "light" || root.classList.contains("light") ? "light" : "dark";
 }
 
+function getMermaidThemeVariables(mode) {
+  const base = mode === "light" ? LIGHT_THEME_VARIABLES : DARK_THEME_VARIABLES;
+  const bg = readRootCssVar("--bg-primary", base.background);
+  const surface = readRootCssVar("--surface-glass", base.mainBkg);
+  const surfaceStrong = readRootCssVar("--control-bg-contrast", base.secondaryColor);
+  const border = readRootCssVar("--border-strong", base.nodeBorder);
+  const accent = readRootCssVar("--accent", base.primaryBorderColor);
+  const success = readRootCssVar("--success-text", base.pie2);
+  const danger = readRootCssVar("--danger-text", base.pie4);
+  const warning = readRootCssVar("--warning-text", base.pie3);
+  const text = readRootCssVar("--text-primary", base.primaryTextColor);
+  const textSecondary = readRootCssVar("--text-secondary", base.secondaryTextColor);
+  const textMuted = readRootCssVar("--text-muted", base.tertiaryTextColor);
+  const line = readRootCssVar("--mermaid-line", base.lineColor);
+  const fontFamily = readRootCssVar("--font-ui", base.fontFamily);
+
+  return {
+    ...base,
+    background: bg,
+    mainBkg: surface,
+    nodeBorder: border,
+    clusterBkg: surfaceStrong,
+    clusterBorder: border,
+    titleColor: text,
+    primaryTextColor: text,
+    secondaryTextColor: textSecondary,
+    tertiaryTextColor: textMuted,
+    lineColor: line,
+    textColor: text,
+    primaryColor: readRootCssVar("--accent-bg", base.primaryColor),
+    primaryBorderColor: accent,
+    secondaryColor: readRootCssVar("--success-bg", base.secondaryColor),
+    secondaryBorderColor: success,
+    tertiaryColor: readRootCssVar("--warning-bg", base.tertiaryColor),
+    tertiaryBorderColor: warning,
+    git0: accent,
+    git1: success,
+    git2: warning,
+    git3: danger,
+    commitLabelColor: textSecondary,
+    commitLabelBackground: surface,
+    pie1: accent,
+    pie2: success,
+    pie3: warning,
+    pie4: danger,
+    pieTitleTextColor: text,
+    pieSectionTextColor: text,
+    pieLegendTextColor: textSecondary,
+    pieStrokeColor: border,
+    pieOuterStrokeColor: border,
+    noteBkgColor: surfaceStrong,
+    noteTextColor: textSecondary,
+    noteBorderColor: border,
+    actorBkg: surface,
+    actorBorder: border,
+    actorTextColor: text,
+    signalColor: textSecondary,
+    labelBoxBkgColor: surface,
+    edgeLabelBackground: bg,
+    classText: textSecondary,
+    fontFamily,
+  };
+}
+
 function initMermaid(mode = getThemeMode()) {
   if (mermaidInitialized && mermaidMode === mode) return;
   mermaid.initialize({
     startOnLoad: false,
     theme: "base",
     suppressErrorRendering: true,
-    themeVariables: { ...(mode === "light" ? LIGHT_THEME_VARIABLES : DARK_THEME_VARIABLES) },
+    themeVariables: getMermaidThemeVariables(mode),
   });
   mermaidInitialized = true;
   mermaidMode = mode;
@@ -209,6 +278,8 @@ export default function MermaidBlock({ code }) {
   useEffect(() => {
     const handleThemeChange = () => {
       clearTimeout(timerRef.current);
+      mermaidInitialized = false;
+      mermaidMode = null;
       lastRendered.current = { code: "", mode: "" };
       setSvg(null);
       setError(false);
@@ -216,7 +287,11 @@ export default function MermaidBlock({ code }) {
     };
 
     window.addEventListener("rayline:theme-change", handleThemeChange);
-    return () => window.removeEventListener("rayline:theme-change", handleThemeChange);
+    window.addEventListener("rayline:appearance-change", handleThemeChange);
+    return () => {
+      window.removeEventListener("rayline:theme-change", handleThemeChange);
+      window.removeEventListener("rayline:appearance-change", handleThemeChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -245,7 +320,9 @@ export default function MermaidBlock({ code }) {
         if (cancelled) return;
         setError(true);
       }).finally(() => {
-        try { document.body.removeChild(offscreen); } catch {}
+        try { document.body.removeChild(offscreen); } catch {
+          // The offscreen render node may already be detached during rapid rerenders.
+        }
       });
     }, 600);
 
@@ -271,7 +348,7 @@ export default function MermaidBlock({ code }) {
         padding: "12px 14px",
         overflow: "auto",
         fontSize: s(12),
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         margin: "8px 0 12px",
         lineHeight: 1.6,
         color: "var(--mermaid-text)",
@@ -292,7 +369,7 @@ export default function MermaidBlock({ code }) {
         textAlign: "center",
         color: "var(--mermaid-text)",
         fontSize: s(11),
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         // Preserve last known height to prevent scroll jumps
         minHeight: lastHeight.current || undefined,
         display: "flex",

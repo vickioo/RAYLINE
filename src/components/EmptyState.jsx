@@ -71,7 +71,7 @@ export default function EmptyState() {
         style={{ width: 420, height: 126, overflow: "visible" }}
         aria-label="RayLine"
       >
-        <g fill={PRIMARY} fontFamily="'Inter Tight', 'Inter', system-ui, sans-serif" fontWeight="600" fontSize="100">
+        <g fill={PRIMARY} fontFamily="var(--font-ui)" fontWeight="600" fontSize="100">
           <text className="rl-letter" x="0"       y="120">R</text>
           <line className="rl-slash" x1="111.04" x2="85.12" y1="53.76" y2="114.24"
                 stroke={ACCENT} strokeWidth="11.52" strokeLinecap="square" />
@@ -95,7 +95,7 @@ export default function EmptyState() {
           alignItems: "center",
           gap: 6,
           marginTop: 32,
-          fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+          fontFamily: "var(--font-mono)",
         }}>
           <div className="rl-sys-1" style={{
             fontSize: s(13),

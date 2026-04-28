@@ -145,6 +145,19 @@ function describeWindow(win) {
   };
 }
 
+function showWindowWhenReady(win) {
+  if (!win) return;
+  let shown = false;
+  const show = () => {
+    if (shown || !win || win.isDestroyed()) return;
+    shown = true;
+    win.show();
+  };
+  win.once("ready-to-show", show);
+  win.webContents.once("did-finish-load", () => setTimeout(show, 0));
+  setTimeout(show, 2500);
+}
+
 function attachTerminalWindowDebug(win) {
   if (!TERMINAL_DEBUG_ENABLED || !win) return;
 
@@ -226,6 +239,7 @@ function createWindow() {
     height: 800,
     minWidth: 800,
     minHeight: 600,
+    show: false,
     backgroundColor: WINDOW_BACKGROUND,
     icon: path.join(__dirname, "../public/icon.png"),
     ...getWindowChromeOptions(),
@@ -236,6 +250,7 @@ function createWindow() {
     },
   });
   applyWindowChromeTweaks(mainWindow);
+  showWindowWhenReady(mainWindow);
 
   // Open external links in system browser
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -269,6 +284,7 @@ function createProjectManagerWindow() {
     height: 700,
     minWidth: 700,
     minHeight: 500,
+    show: false,
     backgroundColor: WINDOW_BACKGROUND,
     icon: path.join(__dirname, "../public/icon.png"),
     ...getWindowChromeOptions(),
@@ -279,6 +295,7 @@ function createProjectManagerWindow() {
     },
   });
   applyWindowChromeTweaks(pmWindow);
+  showWindowWhenReady(pmWindow);
 
   pmWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -476,6 +493,15 @@ ipcMain.handle("set-window-opacity", (event, opacity) => {
   const v = Number(opacity);
   if (!Number.isFinite(v)) return false;
   win.setOpacity(Math.max(0.2, Math.min(1, v)));
+  return true;
+});
+
+ipcMain.handle("set-window-background-color", (event, color) => {
+  const win = BrowserWindow.fromWebContents(event.sender) || mainWindow;
+  if (!win || typeof color !== "string") return false;
+  const normalized = color.trim();
+  if (!/^#[0-9a-fA-F]{6}$/.test(normalized)) return false;
+  win.setBackgroundColor(normalized);
   return true;
 });
 

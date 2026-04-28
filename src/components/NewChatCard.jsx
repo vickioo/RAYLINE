@@ -445,7 +445,7 @@ export default function NewChatCard({
     border: "none",
     outline: "none",
     color: "var(--text-primary)",
-    fontFamily: "system-ui, sans-serif",
+    fontFamily: "var(--font-ui)",
   };
 
   const toolBtnStyle = (active) => ({
@@ -459,7 +459,7 @@ export default function NewChatCard({
     borderRadius: 999,
     color: active ? "var(--text-primary)" : "var(--text-secondary)",
     fontSize: s(10.5),
-    fontFamily: "system-ui, sans-serif",
+    fontFamily: "var(--font-ui)",
     fontWeight: 600,
     cursor: "pointer",
     transition: "all .2s",
@@ -542,7 +542,7 @@ export default function NewChatCard({
                 background: "var(--accent-bg-strong)",
                 border: "1px solid var(--accent-border)",
                 borderRadius: 6, fontSize: s(10),
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 color: "var(--accent-text)",
               }}>
                 {issueContext.split("\n")[0]}
@@ -561,7 +561,7 @@ export default function NewChatCard({
                 background: f.type === "image" ? "var(--success-bg)" : "var(--control-bg)",
                 border: `1px solid ${f.type === "image" ? "var(--success-border)" : "var(--control-bg-strong)"}`,
                 borderRadius: 6, fontSize: s(10),
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 color: "var(--text-secondary)",
               }}>
                 {f.type === "image" && f.dataUrl && (
@@ -686,7 +686,7 @@ export default function NewChatCard({
           />
           <span style={{
             fontSize: s(10), color: "var(--text-disabled)",
-            fontFamily: "'JetBrains Mono', monospace", letterSpacing: ".04em",
+            fontFamily: "var(--font-mono)", letterSpacing: ".04em",
           }}>
             {creatingChat ? "Creating..." : "Enter to create"}
           </span>
@@ -696,7 +696,7 @@ export default function NewChatCard({
           <div style={{
             fontSize: s(10),
             color: "var(--danger-text)",
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "var(--font-mono)",
           }}>
             {error}
           </div>
@@ -769,7 +769,7 @@ const IssueSearchDropdown = forwardRef(function IssueSearchDropdown(
           outline: "none",
           padding: "8px 10px",
           fontSize: s(11),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           color: "var(--text-primary)",
           borderBottom: "1px solid var(--pane-border)",
           borderRadius: "7px 7px 0 0",
@@ -777,12 +777,12 @@ const IssueSearchDropdown = forwardRef(function IssueSearchDropdown(
       />
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
         {loading && (
-          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "'JetBrains Mono',monospace" }}>
+          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
             Loading...
           </div>
         )}
         {!loading && issues.length === 0 && (
-          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "'JetBrains Mono',monospace" }}>
+          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
             No issues found
           </div>
         )}
@@ -801,7 +801,7 @@ const IssueSearchDropdown = forwardRef(function IssueSearchDropdown(
               borderRadius: 7,
               color: "var(--text-secondary)",
               fontSize: s(11),
-              fontFamily: "system-ui, sans-serif",
+              fontFamily: "var(--font-ui)",
               cursor: "pointer",
               textAlign: "left",
               transition: "all .12s",
@@ -810,7 +810,7 @@ const IssueSearchDropdown = forwardRef(function IssueSearchDropdown(
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             <span style={{
-              fontSize: s(9), fontFamily: "'JetBrains Mono',monospace",
+              fontSize: s(9), fontFamily: "var(--font-mono)",
               color: "var(--text-muted)", flexShrink: 0,
             }}>
               #{issue.number}
@@ -897,7 +897,7 @@ const BranchSearchDropdown = forwardRef(function BranchSearchDropdown(
           outline: "none",
           padding: "8px 10px",
           fontSize: s(11),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           color: "var(--text-primary)",
           borderBottom: "1px solid var(--pane-border)",
           borderRadius: "7px 7px 0 0",
@@ -917,7 +917,7 @@ const BranchSearchDropdown = forwardRef(function BranchSearchDropdown(
               borderRadius: 7,
               color: "var(--accent-text)",
               fontSize: s(11),
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
               cursor: "pointer",
               textAlign: "left",
             }}
@@ -929,12 +929,12 @@ const BranchSearchDropdown = forwardRef(function BranchSearchDropdown(
         )}
 
         {loading && (
-          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "'JetBrains Mono',monospace" }}>
+          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
             Loading...
           </div>
         )}
         {!loading && branches.length === 0 && (
-          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "'JetBrains Mono',monospace" }}>
+          <div style={{ padding: "12px 10px", fontSize: s(10), color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
             No branches found
           </div>
         )}
@@ -955,7 +955,7 @@ const BranchSearchDropdown = forwardRef(function BranchSearchDropdown(
               borderRadius: 7,
               color: branchName === currentBranch ? "var(--text-primary)" : "var(--text-secondary)",
               fontSize: s(11),
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
               cursor: "pointer",
               textAlign: "left",
               transition: "all .12s",
@@ -986,7 +986,7 @@ function getNeutralDropdownItemStyle(s) {
     borderRadius: 7,
     color: "var(--text-secondary)",
     fontSize: s(11),
-    fontFamily: "'JetBrains Mono',monospace",
+    fontFamily: "var(--font-mono)",
     cursor: "pointer",
     textAlign: "left",
     transition: "all .12s",
@@ -1063,7 +1063,7 @@ const WorktreeInputDropdown = forwardRef(function WorktreeInputDropdown(
           outline: "none",
           padding: "8px 10px",
           fontSize: s(11),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           color: "var(--text-primary)",
           borderBottom: "1px solid var(--pane-border)",
           borderRadius: "7px 7px 0 0",
@@ -1074,7 +1074,7 @@ const WorktreeInputDropdown = forwardRef(function WorktreeInputDropdown(
         <div style={{
           padding: "6px 10px 2px",
           fontSize: s(9),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           color: "var(--text-muted)",
           letterSpacing: ".04em",
         }}>

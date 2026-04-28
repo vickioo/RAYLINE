@@ -1,7 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
-import { ArrowLeft, Check, ChevronDown, Image } from "lucide-react";
+import { ArrowLeft, Check, ChevronDown, Image, RotateCcw } from "lucide-react";
 import { useFontScale } from "../contexts/FontSizeContext";
 import { useTheme } from "../contexts/ThemeContext.jsx";
+import { DEFAULT_APPEARANCE, FONT_OPTIONS, isValidHexColor, normalizeAppearance } from "../utils/appearance";
 import { getPaneSurfaceStyle } from "../utils/paneSurface";
 import { DEFAULT_WALLPAPER, normalizeWallpaper } from "../utils/wallpaper";
 import { CHIME_SOUNDS, playChime } from "../utils/chime";
@@ -9,10 +10,12 @@ import { loadMulticaState, normalizeMulticaServerUrl, saveMulticaState } from ".
 import { createTranslator } from "../i18n";
 import WindowDragSpacer from "./WindowDragSpacer";
 
-export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFontSizeChange, defaultPrBranch, onDefaultPrBranchChange, coauthorEnabled = false, onCoauthorEnabledChange, appBlur = 0, onAppBlurChange, appOpacity = 100, onAppOpacityChange, developerMode = false, onDeveloperModeChange, chromeControlsOnHover = false, onChromeControlsOnHoverChange, notificationSound = "glass", onNotificationSoundChange, notificationsMuted = false, onNotificationsMutedChange, locale = "en-US", onLocaleChange, onClose }) {
+export default function Settings({ wallpaper, onWallpaperChange, appearance, onAppearanceChange, fontSize, onFontSizeChange, defaultPrBranch, onDefaultPrBranchChange, coauthorEnabled = false, onCoauthorEnabledChange, appBlur = 0, onAppBlurChange, appOpacity = 100, onAppOpacityChange, developerMode = false, onDeveloperModeChange, chromeControlsOnHover = false, onChromeControlsOnHoverChange, notificationSound = "glass", onNotificationSoundChange, notificationsMuted = false, onNotificationsMutedChange, locale = "en-US", onLocaleChange, onClose }) {
   const s = useFontScale();
-  const { mode, setMode } = useTheme();
+  const { mode, resolved, setMode } = useTheme();
   const t = createTranslator(locale);
+  const [editingTheme, setEditingTheme] = useState(() => resolved === "light" ? "light" : "dark");
+  const [themeManagerCollapsed, setThemeManagerCollapsed] = useState(true);
   const [local, setLocal] = useState(() => normalizeWallpaper(wallpaper) ?? { ...DEFAULT_WALLPAPER });
   const [multica, setMultica] = useState(() => loadMulticaState());
   const [multicaServerDraft, setMulticaServerDraft] = useState(() => loadMulticaState().serverUrl || "");
@@ -162,6 +165,59 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
     { value: "light", label: t("settings.themeLight") },
     { value: "dark", label: t("settings.themeDark") },
   ];
+  const normalizedAppearance = normalizeAppearance(appearance);
+  const editingProfile = normalizedAppearance.profiles[editingTheme];
+  const paletteFields = [
+    { key: "accent", label: t("settings.appearanceAccent") },
+    { key: "background", label: t("settings.appearanceBackground") },
+    { key: "pane", label: t("settings.appearancePane") },
+    { key: "surface", label: t("settings.appearanceSurface") },
+    { key: "surfaceStrong", label: t("settings.appearanceSurfaceStrong") },
+    { key: "border", label: t("settings.appearanceBorder") },
+    { key: "text", label: t("settings.appearanceText") },
+    { key: "success", label: t("settings.appearanceSuccess") },
+    { key: "danger", label: t("settings.appearanceDanger") },
+    { key: "warning", label: t("settings.appearanceWarning") },
+  ];
+  const typographyFields = [
+    { key: "uiFont", label: t("settings.appearanceUiFont"), options: FONT_OPTIONS.ui },
+    { key: "contentFont", label: t("settings.appearanceContentFont"), options: FONT_OPTIONS.content },
+    { key: "monoFont", label: t("settings.appearanceMonoFont"), options: FONT_OPTIONS.mono },
+  ];
+
+  const updateAppearanceProfile = useCallback((section, key, value) => {
+    const current = normalizeAppearance(appearance);
+    const currentProfile = current.profiles[editingTheme];
+    const nextProfile = {
+      ...currentProfile,
+      [section]: {
+        ...currentProfile[section],
+        [key]: value,
+      },
+    };
+    onAppearanceChange?.({
+      ...current,
+      profiles: {
+        ...current.profiles,
+        [editingTheme]: nextProfile,
+      },
+    });
+  }, [appearance, editingTheme, onAppearanceChange]);
+
+  const resetAppearanceProfile = useCallback(() => {
+    const current = normalizeAppearance(appearance);
+    onAppearanceChange?.({
+      ...current,
+      profiles: {
+        ...current.profiles,
+        [editingTheme]: DEFAULT_APPEARANCE.profiles[editingTheme],
+      },
+    });
+  }, [appearance, editingTheme, onAppearanceChange]);
+
+  const resetAllAppearance = useCallback(() => {
+    onAppearanceChange?.(DEFAULT_APPEARANCE);
+  }, [onAppearanceChange]);
 
   // Slider track style helper
   const sliderTrack = (pct) =>
@@ -195,7 +251,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
         zIndex: 10,
         ...getPaneSurfaceStyle(Boolean(local.dataUrl)),
         color: "var(--text-primary)",
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
       }}
     >
       <WindowDragSpacer />
@@ -259,7 +315,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
           {/* APPEARANCE section label */}
           <div
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: s(10),
               fontWeight: 600,
               color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
@@ -270,6 +326,156 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
           >
             {t("settings.appearance")}
           </div>
+
+          <SettingBlock style={{ marginBottom: 24 }}>
+            <div style={{ marginBottom: 14 }}>
+              <div
+                style={{
+                  fontSize: s(13),
+                  color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
+                  marginBottom: 2,
+                }}
+              >
+                {t("settings.theme")}
+              </div>
+              <div
+                style={{
+                  fontSize: s(11),
+                  color: "color-mix(in srgb, var(--text-primary) 33%, transparent)",
+                  marginBottom: 10,
+                }}
+              >
+                {t("settings.themeDescription")}
+              </div>
+              <SegmentedControl
+                options={themeOptions}
+                value={mode}
+                onChange={setMode}
+                s={s}
+              />
+            </div>
+
+            <div style={{ marginBottom: themeManagerCollapsed ? 0 : 14 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  marginBottom: themeManagerCollapsed ? 0 : 10,
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: s(13),
+                      color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
+                      marginBottom: 2,
+                    }}
+                  >
+                    {t("settings.appearanceProfile")}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: s(11),
+                      color: "color-mix(in srgb, var(--text-primary) 33%, transparent)",
+                    }}
+                  >
+                    {t("settings.appearanceProfileDescription")}
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  {!themeManagerCollapsed && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={resetAppearanceProfile}
+                        title={t("settings.resetProfile")}
+                        aria-label={t("settings.resetProfile")}
+                        style={iconActionStyle}
+                      >
+                        <RotateCcw size={12} strokeWidth={1.8} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={resetAllAppearance}
+                        style={smallActionStyle(s)}
+                      >
+                        {t("settings.resetAll")}
+                      </button>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setThemeManagerCollapsed((value) => !value)}
+                    title={themeManagerCollapsed ? t("settings.expandThemeManagement") : t("settings.collapseThemeManagement")}
+                    aria-label={themeManagerCollapsed ? t("settings.expandThemeManagement") : t("settings.collapseThemeManagement")}
+                    aria-expanded={!themeManagerCollapsed}
+                    style={iconActionStyle}
+                  >
+                    <ChevronDown
+                      size={13}
+                      strokeWidth={2}
+                      style={{
+                        transform: themeManagerCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+                        transition: "transform 140ms ease",
+                      }}
+                    />
+                  </button>
+                </div>
+              </div>
+              {!themeManagerCollapsed && (
+                <SegmentedControl
+                  options={[
+                    { value: "light", label: t("settings.configureLight") },
+                    { value: "dark", label: t("settings.configureDark") },
+                  ]}
+                  value={editingTheme}
+                  onChange={setEditingTheme}
+                  s={s}
+                />
+              )}
+            </div>
+
+            {!themeManagerCollapsed && (
+              <>
+                <AppearancePreview
+                  profile={editingProfile}
+                  labels={{
+                    accent: t("settings.appearanceAccent"),
+                    surface: t("settings.appearanceSurface"),
+                    text: t("settings.appearanceText"),
+                  }}
+                  s={s}
+                />
+
+                <div style={{ overflow: "hidden", borderRadius: 8, border: "1px solid var(--control-border)" }}>
+                  {paletteFields.map((field) => (
+                    <ColorField
+                      key={field.key}
+                      label={field.label}
+                      value={editingProfile.palette[field.key]}
+                      onChange={(value) => updateAppearanceProfile("palette", field.key, value)}
+                      s={s}
+                    />
+                  ))}
+                </div>
+
+                <div style={{ marginTop: 14, overflow: "hidden", borderRadius: 8, border: "1px solid var(--control-border)" }}>
+                  {typographyFields.map((field) => (
+                    <SelectField
+                      key={field.key}
+                      label={field.label}
+                      value={editingProfile.typography[field.key]}
+                      options={field.options}
+                      onChange={(value) => updateAppearanceProfile("typography", field.key, value)}
+                      s={s}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </SettingBlock>
 
           <div style={{ marginBottom: 24 }}>
             <div
@@ -302,7 +508,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                   border: "1px solid var(--control-border)",
                   borderRadius: 7,
                   color: "var(--text-primary)",
-                  fontFamily: "system-ui, sans-serif",
+                  fontFamily: "var(--font-ui)",
                   fontSize: s(12),
                   outline: "none",
                   WebkitAppearance: "none",
@@ -463,7 +669,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                     fontSize: s(12),
                     cursor: "pointer",
                     transition: "all .2s",
-                    fontFamily: "system-ui, sans-serif",
+                    fontFamily: "var(--font-ui)",
                   }}
                 >
                   {t("settings.chooseImage")}
@@ -484,7 +690,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                       fontSize: s(12),
                       cursor: "pointer",
                       transition: "all .2s",
-                      fontFamily: "system-ui, sans-serif",
+                      fontFamily: "var(--font-ui)",
                     }}
                   >
                     {t("settings.remove")}
@@ -497,7 +703,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
             {pathHint && (
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: s(10),
                   color: "color-mix(in srgb, var(--text-primary) 16%, transparent)",
                   marginTop: 4,
@@ -623,7 +829,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
           {/* TYPOGRAPHY section label */}
           <div
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: s(10),
               fontWeight: 600,
               color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
@@ -660,7 +866,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
           {/* INTEGRATIONS section label */}
           <div
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: s(10),
               fontWeight: 600,
               color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
@@ -760,7 +966,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                   border: "1px solid var(--control-border)",
                   borderRadius: 7,
                   color: "var(--text-primary)",
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: s(12),
                   outline: "none",
                 }}
@@ -781,7 +987,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                   fontSize: s(12),
                   cursor: multicaServerDirty ? "pointer" : "not-allowed",
                   transition: "all .2s",
-                  fontFamily: "system-ui, sans-serif",
+                  fontFamily: "var(--font-ui)",
                 }}
               >
                 {normalizedMulticaServerDraft ? t("settings.saveServer") : t("settings.clearServer")}
@@ -798,7 +1004,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                   fontSize: s(12),
                   cursor: "pointer",
                   transition: "all .2s",
-                  fontFamily: "system-ui, sans-serif",
+                  fontFamily: "var(--font-ui)",
                 }}
               >
                 {multicaConnected ? t("settings.manageConnection") : t("settings.openSetup")}
@@ -816,7 +1022,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                     fontSize: s(12),
                     cursor: "pointer",
                     transition: "all .2s",
-                    fontFamily: "system-ui, sans-serif",
+                    fontFamily: "var(--font-ui)",
                   }}
                 >
                   {t("settings.disconnect")}
@@ -828,7 +1034,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
           {/* ADVANCED section label */}
           <div
             style={{
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: s(10),
               fontWeight: 600,
               color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
@@ -909,7 +1115,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
               {/* NOTIFICATIONS section */}
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: s(10),
                   fontWeight: 600,
                   color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
@@ -944,7 +1150,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                         border: "1px solid var(--control-border)",
                         borderRadius: 7,
                         color: "var(--text-primary)",
-                        fontFamily: "system-ui, sans-serif",
+                        fontFamily: "var(--font-ui)",
                         fontSize: s(12),
                         outline: "none",
                         opacity: notificationsMuted ? 0.4 : 1,
@@ -1048,7 +1254,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
               {/* GIT section label */}
               <div
                 style={{
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: s(10),
                   fontWeight: 600,
                   color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
@@ -1100,7 +1306,7 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
                     border: "1px solid var(--control-border)",
                     borderRadius: 7,
                     color: "var(--text-primary)",
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: s(12),
                     outline: "none",
                   }}
@@ -1175,4 +1381,339 @@ export default function Settings({ wallpaper, onWallpaperChange, fontSize, onFon
       </div>
     </div>
   );
+}
+
+function AppearancePreview({ profile, labels, s }) {
+  const palette = profile.palette;
+  const typography = profile.typography;
+  const border = `color-mix(in srgb, ${palette.border} 18%, transparent)`;
+  const softSurface = `color-mix(in srgb, ${palette.surfaceStrong} 64%, ${palette.background})`;
+
+  return (
+    <div
+      style={{
+        marginBottom: 14,
+        borderRadius: 10,
+        overflow: "hidden",
+        border: `1px solid ${border}`,
+        background: palette.background,
+        color: palette.text,
+        fontFamily: typography.uiFont,
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          minHeight: 98,
+          background: palette.surface,
+        }}
+      >
+        <PreviewCodeSide
+          lineColor={palette.danger}
+          accent={palette.accent}
+          surface={softSurface}
+          text={palette.text}
+          muted={`color-mix(in srgb, ${palette.text} 42%, transparent)`}
+          monoFont={typography.monoFont}
+          s={s}
+          side="left"
+        />
+        <PreviewCodeSide
+          lineColor={palette.success}
+          accent={palette.success}
+          surface={`color-mix(in srgb, ${palette.success} 16%, ${palette.surface})`}
+          text={palette.text}
+          muted={`color-mix(in srgb, ${palette.text} 42%, transparent)`}
+          monoFont={typography.monoFont}
+          s={s}
+          side="right"
+        />
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+          gap: 1,
+          borderTop: `1px solid ${border}`,
+          background: border,
+        }}
+      >
+        {[
+          { label: labels.accent, value: palette.accent },
+          { label: labels.surface, value: palette.surface },
+          { label: labels.text, value: palette.text },
+        ].map((item) => (
+          <div
+            key={item.label}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              minWidth: 0,
+              padding: "9px 10px",
+              background: palette.surfaceStrong,
+            }}
+          >
+            <span
+              style={{
+                width: 14,
+                height: 14,
+                borderRadius: 999,
+                border: `1px solid ${border}`,
+                background: item.value,
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                fontSize: s(10),
+                color: `color-mix(in srgb, ${palette.text} 62%, transparent)`,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PreviewCodeSide({ lineColor, accent, surface, text, muted, monoFont, s, side }) {
+  return (
+    <div
+      style={{
+        padding: "12px 12px 10px",
+        borderLeft: side === "right" ? `1px solid color-mix(in srgb, ${text} 10%, transparent)` : "none",
+        background: surface,
+        fontFamily: monoFont,
+        fontSize: s(10),
+        lineHeight: 1.8,
+      }}
+    >
+      {[1, 2, 3].map((line) => (
+        <div
+          key={line}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "20px 1fr",
+            gap: 10,
+            color: line === 1 ? muted : text,
+          }}
+        >
+          <span style={{ color: muted, textAlign: "right" }}>{line}</span>
+          <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {line === 1 ? "themePreview = {" : line === 2 ? <><span style={{ color: accent }}>accent</span>: "{lineColor}",</> : "};"}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SettingBlock({ children, style }) {
+  return (
+    <div
+      style={{
+        padding: 12,
+        borderRadius: 8,
+        background: "color-mix(in srgb, var(--control-bg) 58%, transparent)",
+        border: "1px solid var(--control-border)",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SegmentedControl({ options, value, onChange, s }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`,
+        gap: 4,
+        padding: 3,
+        borderRadius: 8,
+        background: "var(--control-bg)",
+        border: "1px solid var(--control-border)",
+      }}
+    >
+      {options.map((option) => {
+        const active = option.value === value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange?.(option.value)}
+            style={{
+              height: 28,
+              borderRadius: 6,
+              border: "none",
+              background: active ? "var(--control-bg-active)" : "transparent",
+              color: active ? "var(--text-primary)" : "var(--text-secondary)",
+              cursor: "pointer",
+              fontFamily: "var(--font-ui)",
+              fontSize: s(11),
+              fontWeight: active ? 600 : 500,
+              transition: "background .15s, color .15s",
+            }}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ColorField({ label, value, onChange, s }) {
+  const [draft, setDraft] = useState(value);
+
+  useEffect(() => {
+    setDraft(value);
+  }, [value]);
+
+  const commit = (next) => {
+    setDraft(next);
+    if (isValidHexColor(next)) {
+      onChange?.(next);
+    }
+  };
+
+  return (
+    <div style={fieldRowStyle}>
+      <span style={{ fontSize: s(12), color: "var(--text-secondary)", fontFamily: "var(--font-ui)" }}>
+        {label}
+      </span>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <input
+          type="color"
+          value={isValidHexColor(value) ? value : "#000000"}
+          onChange={(e) => commit(e.target.value.toUpperCase())}
+          aria-label={label}
+          style={{
+            width: 30,
+            height: 24,
+            padding: 0,
+            border: "1px solid var(--control-border)",
+            borderRadius: 999,
+            background: "transparent",
+            cursor: "pointer",
+          }}
+        />
+        <input
+          type="text"
+          value={draft}
+          onChange={(e) => commit(e.target.value)}
+          onBlur={() => {
+            if (!isValidHexColor(draft)) setDraft(value);
+          }}
+          spellCheck={false}
+          style={{
+            width: 96,
+            height: 28,
+            borderRadius: 8,
+            border: `1px solid ${isValidHexColor(draft) ? "var(--control-border)" : "var(--danger-border)"}`,
+            background: "var(--control-bg)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-mono)",
+            fontSize: s(11),
+            padding: "0 8px",
+            outline: "none",
+            textTransform: "uppercase",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function SelectField({ label, value, options, onChange, s }) {
+  return (
+    <div style={fieldRowStyle}>
+      <span style={{ fontSize: s(12), color: "var(--text-secondary)", fontFamily: "var(--font-ui)" }}>
+        {label}
+      </span>
+      <div style={{ position: "relative", display: "flex", alignItems: "center", width: 210 }}>
+        <select
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          style={{
+            width: "100%",
+            height: 30,
+            borderRadius: 8,
+            border: "1px solid var(--control-border)",
+            background: "var(--control-bg)",
+            color: "var(--text-primary)",
+            fontFamily: "var(--font-ui)",
+            fontSize: s(11),
+            padding: "0 28px 0 10px",
+            outline: "none",
+            appearance: "none",
+            WebkitAppearance: "none",
+            MozAppearance: "none",
+          }}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <ChevronDown
+          size={12}
+          strokeWidth={2}
+          style={{
+            position: "absolute",
+            right: 10,
+            color: "var(--text-muted)",
+            pointerEvents: "none",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+const fieldRowStyle = {
+  minHeight: 50,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 14,
+  padding: "10px 12px",
+  borderBottom: "1px solid var(--control-border-soft)",
+};
+
+const iconActionStyle = {
+  width: 28,
+  height: 28,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: 8,
+  border: "1px solid var(--control-border)",
+  background: "var(--control-bg)",
+  color: "var(--text-secondary)",
+  cursor: "pointer",
+};
+
+function smallActionStyle(s) {
+  return {
+    height: 28,
+    padding: "0 10px",
+    borderRadius: 8,
+    border: "1px solid var(--control-border)",
+    background: "var(--control-bg)",
+    color: "var(--text-secondary)",
+    cursor: "pointer",
+    fontFamily: "var(--font-ui)",
+    fontSize: s(11),
+  };
 }

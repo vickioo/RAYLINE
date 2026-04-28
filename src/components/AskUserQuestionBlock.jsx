@@ -100,7 +100,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
         <span
           style={{
             fontSize: s(10),
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             color: "var(--text-muted)",
             letterSpacing: ".1em",
           }}
@@ -121,7 +121,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
                   style={{
                     display: "inline-block",
                     fontSize: s(9),
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     color: "var(--text-muted)",
                     background: "var(--control-bg-strong)",
                     padding: "2px 7px",
@@ -139,7 +139,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
                 style={{
                   fontSize: s(14),
                   color: "var(--text-primary)",
-                  fontFamily: "'Newsreader','Iowan Old Style',Georgia,serif",
+                  fontFamily: "var(--font-content)",
                   lineHeight: 1.6,
                   marginBottom: 10,
                 }}
@@ -214,7 +214,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
                         <div
                           style={{
                             fontSize: s(13),
-                            fontFamily: "system-ui,-apple-system,sans-serif",
+                            fontFamily: "var(--font-ui)",
                             color: selected ? "var(--text-primary)" : "var(--text-secondary)",
                             fontWeight: 500,
                             lineHeight: 1.4,
@@ -227,7 +227,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
                             style={{
                               fontSize: s(11),
                               color: "var(--text-muted)",
-                              fontFamily: "system-ui,-apple-system,sans-serif",
+                              fontFamily: "var(--font-ui)",
                               lineHeight: 1.5,
                               marginTop: 2,
                             }}
@@ -266,7 +266,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
                       borderRadius: 8,
                       color: "var(--text-secondary)",
                       fontSize: s(13),
-                      fontFamily: "system-ui,-apple-system,sans-serif",
+                      fontFamily: "var(--font-ui)",
                       fontWeight: 400,
                       lineHeight: 1.4,
                       padding: "9px 11px",
@@ -289,7 +289,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
                 borderRadius: 6,
                 border: "none",
                 fontSize: s(12),
-                fontFamily: "system-ui,-apple-system,sans-serif",
+                fontFamily: "var(--font-ui)",
                 fontWeight: 500,
                 cursor: hasAnswer ? "pointer" : "default",
                 background: hasAnswer ? "var(--text-primary)" : "var(--control-bg-strong)",
@@ -306,7 +306,7 @@ export default function AskUserQuestionBlock({ tool, onAnswer }) {
           <div style={{
             marginTop: 10,
             fontSize: s(10),
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             color: "var(--text-faint)",
             letterSpacing: ".06em",
           }}>

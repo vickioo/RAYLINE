@@ -78,7 +78,7 @@ function IconActionButton({
             borderRadius: 4,
             color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
             fontSize: 9,
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             letterSpacing: ".04em",
             whiteSpace: "nowrap",
             pointerEvents: "none",
@@ -366,7 +366,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
           borderRadius: 7,
           color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
           fontSize: s(10),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           cursor: "pointer",
           transition: "all .2s",
           letterSpacing: ".04em",
@@ -423,7 +423,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                   borderRadius: 6,
                   color: mode === tab ? "color-mix(in srgb, var(--text-primary) 76%, transparent)" : "color-mix(in srgb, var(--text-primary) 27%, transparent)",
                   fontSize: s(9),
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "var(--font-mono)",
                   letterSpacing: ".08em",
                   cursor: "pointer",
                   transition: "all .15s",
@@ -465,7 +465,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                 borderRadius: 6,
                 color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
                 fontSize: s(10),
-                fontFamily: "'JetBrains Mono',monospace",
+                fontFamily: "var(--font-mono)",
                 outline: "none",
                 boxSizing: "border-box",
               }}
@@ -493,7 +493,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                     }}>
                       <span style={{
                         fontSize: s(10),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         color: "var(--danger-soft-text)",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
@@ -550,7 +550,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                         border: "none",
                         color: b === current ? "var(--text-primary)" : "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                         fontSize: s(11),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         cursor: "pointer",
                         textAlign: "left",
                         padding: 0,
@@ -578,7 +578,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                 <div style={{
                   padding: "10px 12px",
                   fontSize: s(9),
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "var(--font-mono)",
                   color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
                 }}>
                   {t("git.branch.noBranchesMatch")}
@@ -594,7 +594,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                 <div style={{
                   padding: "6px 12px",
                   fontSize: s(9),
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "var(--font-mono)",
                   color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
                   letterSpacing: ".04em",
                 }}>
@@ -621,7 +621,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                     borderRadius: 7,
                     color: !isInWorktree ? "var(--text-primary)" : worktreeLocked ? "color-mix(in srgb, var(--text-primary) 16%, transparent)" : "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                     fontSize: s(11),
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     cursor: worktreeLocked && isInWorktree ? "default" : "pointer",
                     textAlign: "left",
                     transition: "all .12s",
@@ -653,7 +653,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                       }}>
                         <span style={{
                           fontSize: s(10),
-                          fontFamily: "'JetBrains Mono',monospace",
+                          fontFamily: "var(--font-mono)",
                           color: "var(--badge-open-text)",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -688,7 +688,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                       <div style={{
                         marginTop: 6,
                         fontSize: s(9),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         color: promoteError ? "var(--danger-soft-text)" : "color-mix(in srgb, var(--text-primary) 38%, transparent)",
                         lineHeight: 1.4,
                       }}>
@@ -715,7 +715,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                       }}>
                         <span style={{
                           fontSize: s(10),
-                          fontFamily: "'JetBrains Mono',monospace",
+                          fontFamily: "var(--font-mono)",
                           color: "var(--danger-soft-text)",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
@@ -751,7 +751,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                             gap: 6,
                             marginTop: 6,
                             fontSize: s(9),
-                            fontFamily: "'JetBrains Mono',monospace",
+                            fontFamily: "var(--font-mono)",
                             color: "color-mix(in srgb, var(--text-primary) 33%, transparent)",
                             cursor: "pointer",
                           }}
@@ -803,7 +803,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                         border: "none",
                         color: isActive ? "var(--text-primary)" : worktreeLocked ? "color-mix(in srgb, var(--text-primary) 16%, transparent)" : "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                         fontSize: s(11),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         cursor: worktreeLocked && !isActive ? "default" : "pointer",
                         textAlign: "left",
                         padding: 0,
@@ -853,7 +853,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                 <div style={{
                   padding: "10px 12px",
                   fontSize: s(9),
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "var(--font-mono)",
                   color: "color-mix(in srgb, var(--text-primary) 27%, transparent)",
                 }}>
                   {t("git.branch.noWorktreesMatch")}
@@ -867,7 +867,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
               fontSize: s(9),
               color: "var(--danger-soft-text)",
               padding: "4px 12px",
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
             }}>
               {error}
             </div>
@@ -889,7 +889,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                     borderRadius: 5,
                     color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                     fontSize: s(8),
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     letterSpacing: ".06em",
                     cursor: "pointer",
                     flexShrink: 0,
@@ -914,7 +914,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                     borderRadius: 6,
                     color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
                     fontSize: s(10),
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     outline: "none",
                     minWidth: 0,
                   }}
@@ -961,7 +961,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                   fontSize: s(9),
                   color: "var(--danger-soft-text)",
                   padding: "2px 4px",
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "var(--font-mono)",
                 }}>
                   {error}
                 </div>
@@ -981,7 +981,7 @@ export default function BranchSelector({ cwd, onCwdChange, hasMessages, onRefocu
                 borderRadius: 7,
                 color: "color-mix(in srgb, var(--text-primary) 33%, transparent)",
                 fontSize: s(10),
-                fontFamily: "'JetBrains Mono',monospace",
+                fontFamily: "var(--font-mono)",
                 cursor: "pointer",
                 transition: "all .12s",
               }}

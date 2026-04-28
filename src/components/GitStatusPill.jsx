@@ -362,7 +362,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
         backdropFilter: "blur(56px) saturate(1.1)",
         WebkitBackdropFilter: "blur(56px) saturate(1.1)",
         color: "color-mix(in srgb, var(--text-primary) 92%, transparent)",
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
         fontSize: s(12),
         zIndex: 9999,
         overflow: "hidden",
@@ -372,7 +372,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
       <div style={{
         padding: "10px 12px",
         borderBottom: "1px solid color-mix(in srgb, var(--control-border) 63%, transparent)",
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         fontSize: s(11),
         display: "flex",
         flexDirection: "column",
@@ -395,7 +395,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
       {/* file list */}
       <div style={{ padding: "8px 12px", maxHeight: 260, overflowY: "auto" }}>
         {clean && (
-          <div style={{ color: "color-mix(in srgb, var(--text-primary) 43%, transparent)", fontSize: s(10), fontFamily: "'JetBrains Mono',monospace", letterSpacing: ".08em" }}>
+          <div style={{ color: "color-mix(in srgb, var(--text-primary) 43%, transparent)", fontSize: s(10), fontFamily: "var(--font-mono)", letterSpacing: ".08em" }}>
             {t("git.status.noChanges")}
           </div>
         )}
@@ -455,7 +455,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
               border: "1px solid var(--control-border)",
               borderRadius: 6,
               color: "var(--text-primary)",
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
               fontSize: s(12),
               lineHeight: 1.4,
               padding: "6px 8px",
@@ -474,7 +474,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
           justifyContent: "space-between",
           gap: 10,
           color: openPr ? "color-mix(in srgb, var(--text-primary) 78%, transparent)" : "color-mix(in srgb, var(--text-primary) 46%, transparent)",
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: s(11),
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
@@ -504,7 +504,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
                 border: "none",
                 color: "color-mix(in srgb, var(--text-primary) 85%, transparent)",
                 fontSize: s(10),
-                fontFamily: "system-ui,sans-serif",
+                fontFamily: "var(--font-ui)",
                 cursor: busy ? "default" : "pointer",
                 flexShrink: 0,
                 textDecorationLine: "underline",
@@ -534,7 +534,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
             borderRadius: 6,
             color: canCommit ? "var(--text-primary)" : "color-mix(in srgb, var(--text-primary) 33%, transparent)",
             fontSize: s(12),
-            fontFamily: "system-ui,sans-serif",
+            fontFamily: "var(--font-ui)",
             cursor: canCommit ? "pointer" : "default",
             transition: "all .15s",
           }}
@@ -556,7 +556,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
               border: "1px solid " + (canPublish ? "color-mix(in srgb, var(--text-primary) 11%, transparent)" : "color-mix(in srgb, var(--control-border) 63%, transparent)"),
               borderRadius: 6,
               color: canPublish ? "color-mix(in srgb, var(--text-primary) 87%, transparent)" : "color-mix(in srgb, var(--text-primary) 33%, transparent)",
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
               cursor: canPublish ? "pointer" : "default",
             }}
           >
@@ -589,7 +589,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
                 : canPr
                 ? (hasOpenPr ? "var(--badge-open-text)" : "color-mix(in srgb, var(--text-primary) 87%, transparent)")
                 : "color-mix(in srgb, var(--text-primary) 33%, transparent)",
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
               cursor: canPr && !prSuccess ? "pointer" : "default",
             }}
           >
@@ -609,7 +609,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
             borderRadius: 6,
             color: canPull ? "color-mix(in srgb, var(--text-primary) 87%, transparent)" : "color-mix(in srgb, var(--text-primary) 33%, transparent)",
             fontSize: s(12),
-            fontFamily: "system-ui,sans-serif",
+            fontFamily: "var(--font-ui)",
             cursor: canPull && !busy ? "pointer" : "default",
           }}
         >
@@ -623,7 +623,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
           background: "var(--danger-soft-bg)",
           borderTop: "1px solid var(--danger-soft-border)",
           color: "var(--danger-soft-text)",
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: s(11),
           display: "flex",
           alignItems: "flex-start",
@@ -660,7 +660,7 @@ export default function GitStatusPill({ cwd, defaultPrBranch, coauthorEnabled = 
           border: "1px solid " + (open ? "color-mix(in srgb, var(--text-primary) 11%, transparent)" : "var(--control-bg)"),
           color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
           fontSize: s(10),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           letterSpacing: ".04em",
           cursor: "pointer",
           transition: "all .2s",
@@ -734,7 +734,7 @@ function ConfirmDialog({ s, title, body, confirmLabel, destructive, onCancel, on
         WebkitBackdropFilter: "blur(4px)",
         display: "flex", alignItems: "center", justifyContent: "center",
         padding: 24,
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
       }}
     >
       <div
@@ -772,7 +772,7 @@ function ConfirmDialog({ s, title, body, confirmLabel, destructive, onCancel, on
               borderRadius: 7,
               color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
               fontSize: s(12),
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
               cursor: "pointer",
             }}
           >
@@ -788,7 +788,7 @@ function ConfirmDialog({ s, title, body, confirmLabel, destructive, onCancel, on
               borderRadius: 7,
               color: accent,
               fontSize: s(12),
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
               fontWeight: 500,
               cursor: "pointer",
             }}
@@ -811,7 +811,7 @@ function FileSection({ title, files, s, pickCode, action, onAction, onRevert, on
         alignItems: "center",
         color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
         fontSize: s(10),
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         letterSpacing: ".08em",
         marginBottom: 6,
       }}>
@@ -870,7 +870,7 @@ function FileRow({ file, s, letter, action, onAction, onRevert, onIgnore, t }) {
       onMouseLeave={() => setHover(false)}
       style={{
         display: "flex", gap: 6, alignItems: "center",
-        fontFamily: "'JetBrains Mono',monospace", fontSize: s(11),
+        fontFamily: "var(--font-mono)", fontSize: s(11),
         padding: "2px 0", color: "color-mix(in srgb, var(--text-primary) 76%, transparent)",
       }}
     >

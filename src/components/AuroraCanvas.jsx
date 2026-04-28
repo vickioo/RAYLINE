@@ -106,10 +106,12 @@ export default function AuroraCanvas() {
     };
     window.addEventListener("resize", resize);
     window.addEventListener("rayline:theme-change", handleThemeChange);
+    window.addEventListener("rayline:appearance-change", handleThemeChange);
     return () => {
       if (raf != null) cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       window.removeEventListener("rayline:theme-change", handleThemeChange);
+      window.removeEventListener("rayline:appearance-change", handleThemeChange);
     };
   }, [isFocused, isVisible, prefersReducedMotion]);
 

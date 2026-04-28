@@ -270,7 +270,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
           padding: "18px 16px",
           color: "var(--text-muted)",
           fontSize: s(11),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           letterSpacing: ".08em",
         }}
       >
@@ -296,7 +296,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
         <div
           style={{
             fontSize: s(10),
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             color: "var(--danger-text)",
             letterSpacing: ".08em",
             marginBottom: 8,
@@ -308,7 +308,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
           style={{
             fontSize: s(13),
             color: "var(--danger-text-strong)",
-            fontFamily: "system-ui,-apple-system,sans-serif",
+            fontFamily: "var(--font-ui)",
           }}
         >
           {error.message}
@@ -432,7 +432,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
         <span
           style={{
             fontSize: s(10),
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             color: "var(--text-muted)",
             letterSpacing: ".1em",
           }}
@@ -456,7 +456,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
               style={{
                 fontSize: s(15),
                 color: "var(--text-primary)",
-                fontFamily: "'Newsreader','Iowan Old Style',Georgia,serif",
+                fontFamily: "var(--font-content)",
                 lineHeight: 1.35,
               }}
             >
@@ -467,7 +467,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
                 style={{
                   fontSize: s(11),
                   color: "var(--text-muted)",
-                  fontFamily: "system-ui,-apple-system,sans-serif",
+                  fontFamily: "var(--font-ui)",
                   lineHeight: 1.5,
                   marginTop: 2,
                 }}
@@ -518,7 +518,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
                   background: "transparent",
                   color: "var(--text-primary)",
                   fontSize: s(11),
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "var(--font-mono)",
                   textAlign: "right",
                 }}
               />
@@ -526,7 +526,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
                 <span
                   style={{
                     fontSize: s(10.5),
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     color: "var(--text-muted)",
                   }}
                 >
@@ -538,7 +538,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
             <div
               style={{
                 fontSize: s(12),
-                fontFamily: "'JetBrains Mono',monospace",
+                fontFamily: "var(--font-mono)",
                 color: "var(--text-secondary)",
                 background: "var(--control-bg-strong)",
                 border: "1px solid var(--control-border)",
@@ -576,7 +576,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
                   key={option.id}
                   style={{
                     fontSize: s(10),
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     color: active ? "var(--text-secondary)" : "var(--text-disabled)",
                     textAlign: index === 0 ? "left" : index === config.options.length - 1 ? "right" : "center",
                     transition: "color .15s ease",
@@ -601,7 +601,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
           <div
             style={{
               fontSize: s(10),
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
               color: isBoundControl ? "var(--accent-muted)" : "var(--text-disabled)",
               letterSpacing: ".06em",
             }}
@@ -634,7 +634,7 @@ export default function ValueControlBlock({ json, isStreaming, onAnswer, onContr
                 padding: "6px 11px",
                 cursor: canSubmit ? "pointer" : "default",
                 fontSize: s(10),
-                fontFamily: "'JetBrains Mono',monospace",
+                fontFamily: "var(--font-mono)",
                 letterSpacing: ".08em",
                 textTransform: "uppercase",
                 boxShadow: submitted ? "none" : "inset 0 1px 0 var(--control-highlight)",

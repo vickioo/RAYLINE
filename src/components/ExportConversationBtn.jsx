@@ -207,7 +207,7 @@ function MenuButton({ label, onClick, disabled = false }) {
           : hovered ? "var(--text-primary)" : "var(--text-secondary)",
         cursor: disabled ? "default" : "pointer",
         fontSize: s(11),
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         textAlign: "left",
         transition: "background .15s, color .15s",
       }}

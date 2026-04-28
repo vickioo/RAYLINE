@@ -183,7 +183,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
             padding: "8px 10px", borderRadius: 7,
             background: "none", border: "none", cursor: "pointer",
             color: "color-mix(in srgb, var(--text-primary) 60%, transparent)", fontSize: s(12),
-            fontFamily: "system-ui, sans-serif", transition: "all .15s",
+            fontFamily: "var(--font-ui)", transition: "all .15s",
             textAlign: "left",
           }}
           onMouseEnter={(e) => { applyPaneInteractionStyle(e.currentTarget, "hover"); e.currentTarget.style.color = "color-mix(in srgb, var(--text-primary) 87%, transparent)"; }}
@@ -199,7 +199,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
             padding: "8px 10px", borderRadius: 7,
             background: "none", border: "none", cursor: "pointer",
             color: "color-mix(in srgb, var(--text-primary) 60%, transparent)", fontSize: s(12),
-            fontFamily: "system-ui, sans-serif", transition: "all .15s",
+            fontFamily: "var(--font-ui)", transition: "all .15s",
             textAlign: "left",
           }}
           onMouseEnter={(e) => { applyPaneInteractionStyle(e.currentTarget, "hover"); e.currentTarget.style.color = "color-mix(in srgb, var(--text-primary) 87%, transparent)"; }}
@@ -215,7 +215,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
             padding: "8px 10px", borderRadius: 7,
             background: "none", border: "none", cursor: "pointer",
             color: "color-mix(in srgb, var(--text-primary) 60%, transparent)", fontSize: s(12),
-            fontFamily: "system-ui, sans-serif", transition: "all .15s",
+            fontFamily: "var(--font-ui)", transition: "all .15s",
             textAlign: "left",
           }}
           onMouseEnter={(e) => { applyPaneInteractionStyle(e.currentTarget, "hover"); e.currentTarget.style.color = "color-mix(in srgb, var(--text-primary) 87%, transparent)"; }}
@@ -232,7 +232,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
               padding: "8px 10px", borderRadius: 7,
               background: "none", border: "none", cursor: "pointer",
               color: "color-mix(in srgb, var(--text-primary) 60%, transparent)", fontSize: s(12),
-              fontFamily: "system-ui, sans-serif", transition: "all .15s",
+              fontFamily: "var(--font-ui)", transition: "all .15s",
               textAlign: "left",
             }}
             onMouseEnter={(e) => { applyPaneInteractionStyle(e.currentTarget, "hover"); e.currentTarget.style.color = "color-mix(in srgb, var(--text-primary) 87%, transparent)"; }}
@@ -249,7 +249,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
             padding: "8px 10px", borderRadius: 7,
             background: "none", border: "none", cursor: "pointer",
             color: "color-mix(in srgb, var(--text-primary) 60%, transparent)", fontSize: s(12),
-            fontFamily: "system-ui, sans-serif", transition: "all .15s",
+            fontFamily: "var(--font-ui)", transition: "all .15s",
             textAlign: "left",
           }}
           onMouseEnter={(e) => { applyPaneInteractionStyle(e.currentTarget, "hover"); e.currentTarget.style.color = "color-mix(in srgb, var(--text-primary) 87%, transparent)"; }}
@@ -292,7 +292,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
               border: "none",
               color: "color-mix(in srgb, var(--text-primary) 87%, transparent)",
               fontSize: s(11),
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
             }}
           />
         </div>}
@@ -313,7 +313,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
           }}>
             <div style={{
               fontSize: s(11),
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
               color: "color-mix(in srgb, var(--text-primary) 16%, transparent)",
               letterSpacing: ".08em",
             }}>
@@ -322,7 +322,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
             <div style={{
               fontSize: s(10),
               color: "color-mix(in srgb, var(--text-primary) 11%, transparent)",
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
             }}>
               {t("sidebar.noConversationsHint")}
             </div>
@@ -388,7 +388,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
               <span
                 style={{
                   fontSize: s(11),
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "var(--font-mono)",
                   color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                   letterSpacing: ".04em",
                 }}
@@ -481,7 +481,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
-                            fontFamily: "system-ui,sans-serif",
+                            fontFamily: "var(--font-ui)",
                             flex: 1,
                             minWidth: 0,
                           }}
@@ -535,7 +535,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
                     <div
                       style={{
                         fontSize: s(9),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         color: "color-mix(in srgb, var(--text-primary) 38%, transparent)",
                         letterSpacing: ".08em",
                         minWidth: 0,
@@ -552,7 +552,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
                           gap: 5,
                           flexShrink: 0,
                           fontSize: s(8.5),
-                          fontFamily: "'JetBrains Mono',monospace",
+                          fontFamily: "var(--font-mono)",
                           color: "rgba(165,255,210,0.5)",
                           letterSpacing: ".08em",
                         }}
@@ -597,7 +597,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
             border: "none",
             cursor: "pointer",
             fontSize: s(8),
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             color: "color-mix(in srgb, var(--text-primary) 49%, transparent)",
             letterSpacing: ".08em",
             padding: 0,
@@ -609,7 +609,7 @@ export default function Sidebar({ convos, active, onSelect, onNew, onDelete, cwd
           <FolderOpen size={10} strokeWidth={1.5} />
           {cwdShort || "SELECT FOLDER"}
         </button>
-        <span style={{ fontSize: s(8), fontFamily: "'JetBrains Mono',monospace", color: "color-mix(in srgb, var(--text-primary) 41%, transparent)", letterSpacing: ".06em" }}>
+        <span style={{ fontSize: s(8), fontFamily: "var(--font-mono)", color: "color-mix(in srgb, var(--text-primary) 41%, transparent)", letterSpacing: ".06em" }}>
           {convos.length} CHATS
         </span>
       </div>

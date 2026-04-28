@@ -237,7 +237,7 @@ function ToolbarBtn({ label, onClick, active }) {
         color: active ? "var(--text-primary)" : hovered ? "var(--text-primary)" : "var(--text-secondary)",
         cursor: "pointer",
         fontSize: s(11),
-        fontFamily: "system-ui,sans-serif",
+        fontFamily: "var(--font-ui)",
         fontWeight: 500,
         transition: "all .15s",
         letterSpacing: ".01em",
@@ -271,7 +271,7 @@ function ExplainPane({ explanation, position }) {
           gap: 6,
           color: "var(--text-muted)",
           fontSize: s(12),
-          fontFamily: "system-ui,sans-serif",
+          fontFamily: "var(--font-ui)",
         }}>
           <Loader2 size={12} strokeWidth={2} style={{ animation: "spin 1s linear infinite" }} />
           Thinking...
@@ -281,7 +281,7 @@ function ExplainPane({ explanation, position }) {
           color: "var(--text-secondary)",
           fontSize: s(13),
           lineHeight: 1.6,
-          fontFamily: "'Newsreader','Iowan Old Style',Georgia,serif",
+          fontFamily: "var(--font-content)",
           letterSpacing: "0.005em",
         }}>
           <Markdown remarkPlugins={[remarkGfm]}>

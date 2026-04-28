@@ -31,7 +31,7 @@ export default function CopyBtn({ text, title = "Copy" }) {
         alignItems: "center",
         gap: 3,
         fontSize: s(10),
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
       }}
       onMouseEnter={(e) => { if (!ok) e.currentTarget.style.color = "var(--text-secondary)"; }}
       onMouseLeave={(e) => { if (!ok) e.currentTarget.style.color = "var(--text-muted)"; }}

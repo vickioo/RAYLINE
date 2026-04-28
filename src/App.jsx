@@ -13,9 +13,11 @@ import MulticaSetupModal from "./components/MulticaSetupModal";
 import NewProjectModal from "./components/NewProjectModal";
 import { DEFAULT_MODEL_ID, getMOrMulticaFallback, isMulticaModelId, MODELS, normalizeModelId } from "./data/models";
 import { useMulticaModels } from "./data/multicaModels.jsx";
+import { useTheme } from "./contexts/ThemeContext.jsx";
 import { buildConversationPrime, buildCrossProviderPrime, decoratePromptWithPrime } from "./utils/crossProviderPrime";
 import { resolveSafeCwd, buildMissingCwdReminder, decoratePromptWithReminder, getMainRepoRoot as getMainRepoRootUtil } from "./utils/cwdRecovery";
 import { FontSizeContext } from "./contexts/FontSizeContext";
+import { applyAppearanceToDocument, normalizeAppearance } from "./utils/appearance";
 import { getPaneSurfaceStyle } from "./utils/paneSurface";
 import { DEFAULT_WALLPAPER, getPersistedWallpaper, getWallpaperImageFilter, normalizeWallpaper } from "./utils/wallpaper";
 import { detectDefaultLocale, normalizeLocale } from "./i18n";
@@ -1089,6 +1091,7 @@ export default function App() {
   const terminal = useTerminal();
   const { prefersReducedMotion } = useWindowActivity();
   const { models: multicaModels } = useMulticaModels();
+  const { resolved: resolvedTheme } = useTheme();
 
   // convos: array of { id, sessionId, title, model, ts }
   const [convoList, setConvoList] = useState([]);
@@ -1098,6 +1101,7 @@ export default function App() {
   const [cwd, setCwd] = useState(null);
   const [stateLoaded, setStateLoaded] = useState(false);
   const [wallpaper, setWallpaper] = useState(null);
+  const [appearance, setAppearance] = useState(() => normalizeAppearance());
   const [locale, setLocale] = useState(() => detectDefaultLocale());
   const [fontSize, setFontSize] = useState(15);
   const [sidebarActiveOpacity, setSidebarActiveOpacity] = useState(DEFAULT_SIDEBAR_ACTIVE_OPACITY);
@@ -1175,6 +1179,7 @@ export default function App() {
     fontSize,
     sidebarActiveOpacity,
     wallpaper: getPersistedWallpaper(wallpaper),
+    appearance,
     projects,
     draftsCollapsed,
     defaultPrBranch,
@@ -1188,6 +1193,7 @@ export default function App() {
     notificationsMuted,
     queuedMessages,
   }), [
+    appearance,
     appBlur,
     appOpacity,
     coauthorEnabled,
@@ -1444,6 +1450,7 @@ export default function App() {
         if (state.cwd) setCwd(state.cwd);
         if (state.defaultModel) setDefaultModel(normalizeModelId(state.defaultModel));
         if (state.locale) setLocale(normalizeLocale(state.locale));
+        if (state.appearance) setAppearance(normalizeAppearance(state.appearance));
         if (state.fontSize) setFontSize(state.fontSize);
         if (state.sidebarActiveOpacity != null) {
           setSidebarActiveOpacity(clampNumber(state.sidebarActiveOpacity, 0, 20, DEFAULT_SIDEBAR_ACTIVE_OPACITY));
@@ -1480,6 +1487,10 @@ export default function App() {
     });
     window.api.getDraftsPath?.().then((p) => { if (p) setDraftsPath(p); });
   }, []);
+
+  useEffect(() => {
+    applyAppearanceToDocument(appearance, resolvedTheme);
+  }, [appearance, resolvedTheme]);
 
   // Persist state to file on changes (skip until initial load is done)
   const saveTimer = useRef(null);
@@ -3500,6 +3511,8 @@ export default function App() {
         <Settings
           wallpaper={wallpaper}
           onWallpaperChange={setWallpaper}
+          appearance={appearance}
+          onAppearanceChange={(next) => setAppearance(normalizeAppearance(next))}
           fontSize={fontSize}
           onFontSizeChange={setFontSize}
           defaultPrBranch={defaultPrBranch}

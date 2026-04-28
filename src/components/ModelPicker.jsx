@@ -181,7 +181,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
           borderRadius: 7,
           color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
           fontSize: s(10),
-          fontFamily: "'JetBrains Mono',monospace",
+          fontFamily: "var(--font-mono)",
           cursor: "pointer",
           transition: "all .2s",
           letterSpacing: ".06em",
@@ -225,7 +225,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
               return (
                 <div key={provider}>
                   {gi > 0 && <div style={{ height: 1, background: "var(--control-bg)", margin: "4px 8px" }} />}
-                  <div style={{ padding: gi === 0 ? "6px 10px 2px" : "4px 10px 2px", fontSize: s(8), color: "color-mix(in srgb, var(--text-primary) 22%, transparent)", letterSpacing: ".12em", fontFamily: "'JetBrains Mono',monospace" }}>
+                  <div style={{ padding: gi === 0 ? "6px 10px 2px" : "4px 10px 2px", fontSize: s(8), color: "color-mix(in srgb, var(--text-primary) 22%, transparent)", letterSpacing: ".12em", fontFamily: "var(--font-mono)" }}>
                     {provider.toUpperCase()}
                   </div>
                   {cliUnknown && (
@@ -243,7 +243,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                         borderRadius: 7,
                         color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                         fontSize: s(11),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         cursor: "default",
                         textAlign: "left",
                         opacity: 0.5,
@@ -271,7 +271,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                         borderRadius: 7,
                         color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                         fontSize: s(11),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         cursor: "pointer",
                         textAlign: "left",
                         transition: "all .12s",
@@ -300,7 +300,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                             borderRadius: 7,
                             color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                             fontSize: s(11),
-                            fontFamily: "'JetBrains Mono',monospace",
+                            fontFamily: "var(--font-mono)",
                             cursor: "default",
                             textAlign: "left",
                             opacity: 0.5,
@@ -330,7 +330,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                             borderRadius: 7,
                             color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                             fontSize: s(11),
-                            fontFamily: "'JetBrains Mono',monospace",
+                            fontFamily: "var(--font-mono)",
                             cursor: "pointer",
                             textAlign: "left",
                             transition: "all .12s",
@@ -360,7 +360,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                             borderRadius: 7,
                             color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                             fontSize: s(11),
-                            fontFamily: "'JetBrains Mono',monospace",
+                            fontFamily: "var(--font-mono)",
                             cursor: "not-allowed",
                             textAlign: "left",
                             opacity: 0.4,
@@ -392,7 +392,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                             borderRadius: 7,
                             color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                             fontSize: s(11),
-                            fontFamily: "'JetBrains Mono',monospace",
+                            fontFamily: "var(--font-mono)",
                             cursor: "not-allowed",
                             textAlign: "left",
                             opacity: 0.4,
@@ -425,7 +425,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                           borderRadius: 7,
                           color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                           fontSize: s(11),
-                          fontFamily: "'JetBrains Mono',monospace",
+                          fontFamily: "var(--font-mono)",
                           cursor: "pointer",
                           textAlign: "left",
                           transition: "all .12s",
@@ -452,7 +452,7 @@ export default function ModelPicker({ value, onChange, extraModels = [], extraEr
                         borderRadius: 7,
                         color: mm.id === value ? "var(--text-primary)" : "color-mix(in srgb, var(--text-primary) 43%, transparent)",
                         fontSize: s(11),
-                        fontFamily: "'JetBrains Mono',monospace",
+                        fontFamily: "var(--font-mono)",
                         cursor: "pointer",
                         textAlign: "left",
                         transition: "all .12s",

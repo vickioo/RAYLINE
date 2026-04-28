@@ -61,7 +61,7 @@ export default function Tab({ title, state, active, onSelect, onClose }) {
           flex: 1,
           fontSize: s(11.5),
           color: active ? "var(--text-primary)" : "var(--text-secondary)",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "var(--font-ui)",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",

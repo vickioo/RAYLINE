@@ -7,7 +7,8 @@ import { MAC_TRAFFIC_LIGHT_SAFE_WIDTH, WINDOW_DRAG_HEIGHT } from "../windowChrom
 
 // ── Shared style helpers ──────────────────────────────────────────────────────
 
-const FONT_FAMILY = "'JetBrains Mono','Fira Code',monospace";
+const DEFAULT_FONT_FAMILY = "'JetBrains Mono','Fira Code',monospace";
+const FONT_FAMILY = "var(--font-mono)";
 const XTERM_TRANSPARENT = "rgba(0,0,0,0)";
 const TERMINAL_OPAQUE_BG = "#0D0D10";
 const ESC = "\x1b";
@@ -84,25 +85,29 @@ function getTerminalTheme(opaqueBackground, mode = "dark") {
   };
 }
 
-function serializeTerminalBuffer(term) {
-  const serializeAddon = term?.__raylineSerializeAddon;
-  if (serializeAddon?.serialize) {
-    try {
-      return serializeAddon.serialize();
-    } catch {
-      // Fall through to the public buffer API fallback.
-    }
-  }
+function getTerminalHostBackground(opaqueBackground) {
+  return opaqueBackground ? "var(--term-background)" : "transparent";
+}
 
-  const buffer = term?.buffer?.active;
-  if (!buffer?.getLine || !Number.isFinite(buffer.length)) return "";
-
-  const lines = [];
-  for (let row = 0; row < buffer.length; row += 1) {
-    const line = buffer.getLine(row);
-    lines.push(line?.translateToString(true) ?? "");
+function applyTerminalVisualState(term, hostEl, containerEl, opaqueBackground, mode) {
+  const hostBackground = getTerminalHostBackground(opaqueBackground);
+  if (hostEl) {
+    hostEl.classList.toggle("rayline-terminal-host--opaque", opaqueBackground);
+    hostEl.style.background = hostBackground;
   }
-  return lines.join("\r\n");
+  if (containerEl) {
+    containerEl.style.background = hostBackground;
+  }
+  if (!term) return;
+
+  try {
+    term.options.theme = getTerminalTheme(opaqueBackground, mode);
+    term.options.fontFamily = readRootCssVar("--font-mono", DEFAULT_FONT_FAMILY);
+    term.options.allowTransparency = true;
+    term.refresh?.(0, Math.max(0, term.rows - 1));
+  } catch {
+    // xterm option updates can fail during teardown; the next mount will apply them.
+  }
 }
 
 function emitTerminalDebug(event, details = {}) {
@@ -473,8 +478,6 @@ function SessionTerminal({
   const lastSyncedPtySizeRef = useRef("");
   const mouseGestureRef = useRef(null);
   const themeModeRef = useRef(getResolvedThemeMode());
-  const pendingScrollbackRef = useRef("");
-  const [themeRevision, setThemeRevision] = useState(0);
 
   // Stable refs so the async IIFE captures up-to-date callbacks without
   // restarting the effect every time parent re-renders.
@@ -483,6 +486,7 @@ function SessionTerminal({
   const registerRef = useRef(registerTerminal);
   const unregRef = useRef(unregisterTerminal);
   const activeRef = useRef(isActive);
+  const opaqueBackgroundRef = useRef(opaqueBackground);
   useEffect(() => { sendRef.current = onSendInput; }, [onSendInput]);
   useEffect(() => { resizeRef.current = onResizeSession; }, [onResizeSession]);
   useEffect(() => { registerRef.current = registerTerminal; }, [registerTerminal]);
@@ -492,13 +496,36 @@ function SessionTerminal({
   useEffect(() => {
     const handleThemeChange = (event) => {
       themeModeRef.current = getResolvedThemeMode(event.detail);
-      pendingScrollbackRef.current = serializeTerminalBuffer(termRef.current);
-      setThemeRevision((revision) => revision + 1);
+      applyTerminalVisualState(
+        termRef.current,
+        xtermElRef.current,
+        containerRef.current,
+        opaqueBackground,
+        themeModeRef.current
+      );
+      window.requestAnimationFrame(() => {
+        try { termRef.current?.__raylineFit?.(); } catch { /* ignore theme-fit races */ }
+      });
     };
 
     window.addEventListener("rayline:theme-change", handleThemeChange);
-    return () => window.removeEventListener("rayline:theme-change", handleThemeChange);
-  }, []);
+    window.addEventListener("rayline:appearance-change", handleThemeChange);
+    return () => {
+      window.removeEventListener("rayline:theme-change", handleThemeChange);
+      window.removeEventListener("rayline:appearance-change", handleThemeChange);
+    };
+  }, [opaqueBackground]);
+
+  useEffect(() => {
+    opaqueBackgroundRef.current = opaqueBackground;
+    applyTerminalVisualState(
+      termRef.current,
+      xtermElRef.current,
+      containerRef.current,
+      opaqueBackground,
+      themeModeRef.current
+    );
+  }, [opaqueBackground]);
 
   const teardown = useCallback(() => {
     fitTimersRef.current.forEach((timer) => window.clearTimeout(timer));
@@ -534,15 +561,16 @@ function SessionTerminal({
       if (cancelled) return;
       if (!containerRef.current) return;
 
+      const initialOpaqueBackground = opaqueBackgroundRef.current;
       const el = document.createElement("div");
-      el.className = `rayline-terminal-host${opaqueBackground ? " rayline-terminal-host--opaque" : ""}`;
-      el.style.cssText = `width:100%;height:100%;background:${opaqueBackground ? TERMINAL_OPAQUE_BG : "transparent"};`;
+      el.className = `rayline-terminal-host${initialOpaqueBackground ? " rayline-terminal-host--opaque" : ""}`;
+      el.style.cssText = `width:100%;height:100%;background:${getTerminalHostBackground(initialOpaqueBackground)};`;
       xtermElRef.current = el;
       containerRef.current.appendChild(el);
 
       const term = new Terminal({
-        theme: getTerminalTheme(opaqueBackground, themeModeRef.current),
-        fontFamily: FONT_FAMILY,
+        theme: getTerminalTheme(initialOpaqueBackground, themeModeRef.current),
+        fontFamily: readRootCssVar("--font-mono", DEFAULT_FONT_FAMILY),
         fontSize: 13,
         fontWeight: "400",
         fontWeightBold: "600",
@@ -557,7 +585,7 @@ function SessionTerminal({
         rescaleOverlappingGlyphs: true,
         scrollback: 5000,
         smoothScrollDuration: 90,
-        allowTransparency: !opaqueBackground,
+        allowTransparency: true,
         allowProposedApi: true,
       });
 
@@ -780,15 +808,13 @@ function SessionTerminal({
 
       registerRef.current(sessionName, term);
 
-      const pendingScrollback = pendingScrollbackRef.current;
-      pendingScrollbackRef.current = "";
-      if (pendingScrollback) {
-        term.write(pendingScrollback);
-      } else if (window.api?.terminalRead) {
+      if (window.api?.terminalRead) {
         try {
           const result = await window.api.terminalRead({ name: sessionName, lines: 500 });
           if (!cancelled && result?.ok && result.lines?.length) {
-            term.write(result.lines.join("\n"));
+            term.write(result.lines.join("\r\n"), () => {
+              try { term.scrollToBottom?.(); } catch { /* ignore scroll restore races */ }
+            });
           }
         } catch { /* ignore scrollback preload failures */ }
       }
@@ -838,7 +864,7 @@ function SessionTerminal({
       emitTerminalDebug("session:teardown", { sessionName });
       teardown();
     };
-  }, [opaqueBackground, plainClickMovesCursor, promptSelectionEditing, promptUndoShortcut, sessionName, teardown, themeRevision]);
+  }, [plainClickMovesCursor, promptSelectionEditing, promptUndoShortcut, sessionName, teardown]);
 
   useEffect(() => {
     const logActiveState = (phase) => {
@@ -895,7 +921,7 @@ function SessionTerminal({
           width: "100%",
           height: "100%",
           overflow: "hidden",
-          background: opaqueBackground ? TERMINAL_OPAQUE_BG : "transparent",
+          background: getTerminalHostBackground(opaqueBackground),
           padding: "10px 6px 8px",
           boxSizing: "border-box",
           minHeight: 0,
@@ -1255,7 +1281,7 @@ export default function TerminalDrawer({
             style={{
               display: "flex",
               alignItems: "center",
-              justifyContent: windowMode ? "flex-end" : "space-between",
+              justifyContent: "space-between",
               height: WINDOW_DRAG_HEIGHT,
               padding: windowMode && isMac
                 ? `0 14px 0 ${MAC_TRAFFIC_LIGHT_SAFE_WIDTH + 8}px`
@@ -1263,33 +1289,33 @@ export default function TerminalDrawer({
               WebkitAppRegion: "drag",
             }}
           >
-            {!windowMode && (
-              <div
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 7,
+                minWidth: 0,
+                WebkitAppRegion: "drag",
+              }}
+            >
+              <TerminalIcon
+                size={13}
+                strokeWidth={1.5}
+                color="var(--text-muted)"
+              />
+              <span
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 7,
-                  WebkitAppRegion: "drag",
+                  fontSize: s(10),
+                  fontFamily: FONT_FAMILY,
+                  color: "var(--text-muted)",
+                  letterSpacing: ".08em",
+                  userSelect: "none",
+                  whiteSpace: "nowrap",
                 }}
               >
-                <TerminalIcon
-                  size={13}
-                  strokeWidth={1.5}
-                  color="var(--text-muted)"
-                />
-                <span
-                  style={{
-                    fontSize: s(10),
-                    fontFamily: FONT_FAMILY,
-                    color: "var(--text-muted)",
-                    letterSpacing: ".08em",
-                    userSelect: "none",
-                  }}
-                >
-                  TERMINALS
-                </span>
-              </div>
-            )}
+                TERMINALS
+              </span>
+            </div>
 
             {/* Right: action buttons */}
             <div

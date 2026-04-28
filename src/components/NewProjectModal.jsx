@@ -200,7 +200,7 @@ const cardStyle = {
   WebkitBackdropFilter: "blur(48px) saturate(1.2)",
   border: "1px solid var(--border)",
   borderRadius: 12, display: "flex", flexDirection: "column",
-  color: "var(--text-primary)", fontFamily: "system-ui, sans-serif", fontSize: 13,
+  color: "var(--text-primary)", fontFamily: "var(--font-ui)", fontSize: 13,
   boxShadow: "var(--shadow-md)",
 };
 const headerStyle = {
@@ -258,13 +258,13 @@ const inputStyle = {
   width: "100%", padding: "8px 10px", borderRadius: 6,
   background: "var(--bg-tertiary)",
   border: "1px solid var(--border)",
-  color: "var(--text-primary)", fontSize: 13, fontFamily: "'JetBrains Mono',monospace",
+  color: "var(--text-primary)", fontSize: 13, fontFamily: "var(--font-mono)",
   outline: "none", boxSizing: "border-box",
 };
 const labelStyle = { fontSize: 11, color: "var(--text-secondary)", marginBottom: 4 };
 const hintStyle = { fontSize: 11, color: "var(--text-muted)", marginTop: 6 };
 const codeStyle = {
-  fontFamily: "'JetBrains Mono',monospace", fontSize: 10.5,
+  fontFamily: "var(--font-mono)", fontSize: 10.5,
   background: "var(--hover-overlay)", padding: "1px 5px",
   borderRadius: 4,
 };

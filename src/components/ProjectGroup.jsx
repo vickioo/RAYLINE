@@ -112,7 +112,7 @@ function ProjectGroup({
             flex: 1,
             minWidth: 0,
             fontSize: s(11),
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: "var(--font-mono)",
             color: "color-mix(in srgb, var(--text-primary) 43%, transparent)",
             letterSpacing: ".04em",
             overflow: "hidden",
@@ -132,7 +132,7 @@ function ProjectGroup({
                 top: "50%",
                 transform: "translateY(-50%)",
                 fontSize: s(9),
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 color: "color-mix(in srgb, var(--text-primary) 16%, transparent)",
                 letterSpacing: ".04em",
                 opacity: headerHovered ? 0 : 1,
@@ -421,7 +421,7 @@ const ConversationRow = memo(function ConversationRow({
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
-              fontFamily: "system-ui,sans-serif",
+              fontFamily: "var(--font-ui)",
               marginBottom: 4,
             }}
           >
@@ -486,7 +486,7 @@ const ConversationRow = memo(function ConversationRow({
         <div
           style={{
             fontSize: s(9),
-            fontFamily: "'JetBrains Mono',monospace",
+            fontFamily: "var(--font-mono)",
             color: "color-mix(in srgb, var(--text-primary) 38%, transparent)",
             letterSpacing: ".08em",
             minWidth: 0,
@@ -504,7 +504,7 @@ const ConversationRow = memo(function ConversationRow({
               flexShrink: 0,
               transform: "translateX(-2px)",
               fontSize: s(8.5),
-              fontFamily: "'JetBrains Mono',monospace",
+              fontFamily: "var(--font-mono)",
               color: "var(--badge-open-text)",
               letterSpacing: ".08em",
             }}
@@ -539,7 +539,7 @@ function MenuBtn({ s, label, onClick, danger = false }) {
         borderRadius: 7,
         color: danger ? "var(--danger-soft-text)" : "color-mix(in srgb, var(--text-primary) 60%, transparent)",
         fontSize: s(11),
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
         cursor: "pointer",
         textAlign: "left",
         transition: "all .12s",

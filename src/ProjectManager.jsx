@@ -18,6 +18,8 @@ import IssueList from "./pm-components/IssueList";
 import PRList from "./pm-components/PRList";
 import ItemDetail from "./pm-components/ItemDetail";
 import HoverIconButton from "./components/HoverIconButton";
+import { useTheme } from "./contexts/ThemeContext.jsx";
+import { applyAppearanceToDocument, normalizeAppearance } from "./utils/appearance";
 import { getPaneInteractionStyle, getPaneSurfaceStyle } from "./utils/paneSurface";
 import { getWallpaperImageFilter, normalizeWallpaper } from "./utils/wallpaper";
 import { createTranslator, detectDefaultLocale, normalizeLocale } from "./i18n";
@@ -56,7 +58,7 @@ function RepoFilterItem({ label, active, onClick, removeMode, isAll = false }) {
         border: "none",
         cursor: "pointer",
         fontSize: 12,
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
         color: active
           ? "var(--text-primary)"
           : "var(--text-subtle)",
@@ -93,7 +95,7 @@ function TabButton({ label, active, onClick }) {
         borderBottom: active ? "2px solid var(--text-secondary)" : "2px solid transparent",
         color: active ? "var(--text-primary)" : "var(--text-subtle)",
         fontSize: 13,
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
         padding: "10px 16px",
         cursor: "pointer",
         transition: "color .15s, border-color .15s",
@@ -116,7 +118,7 @@ function StateToggle({ value, onChange, openLabel = "OPEN", closedLabel = "CLOSE
           borderRadius: 6,
           color: active ? "var(--text-secondary)" : "var(--text-disabled)",
           fontSize: 11,
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: "var(--font-mono)",
           letterSpacing: ".04em",
           padding: "4px 10px",
           cursor: "pointer",
@@ -137,6 +139,7 @@ function StateToggle({ value, onChange, openLabel = "OPEN", closedLabel = "CLOSE
 }
 
 export default function ProjectManager() {
+  const { resolved: resolvedTheme } = useTheme();
   const [locale, setLocale] = useState(() => detectDefaultLocale());
   const [repos, setRepos] = useState([]);
   const [activeTab, setActiveTab] = useState("issues");
@@ -150,6 +153,7 @@ export default function ProjectManager() {
   const [showAccountManager, setShowAccountManager] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [wallpaper, setWallpaper] = useState(null);
+  const [appearance, setAppearance] = useState(() => normalizeAppearance());
   const [stateLoaded, setStateLoaded] = useState(false);
   const [showCreate, setShowCreate] = useState(null); // null | "issue" | "pr"
   const [refreshSignal, setRefreshSignal] = useState(0);
@@ -173,6 +177,7 @@ export default function ProjectManager() {
       const { repos, wallpaper: wp } = pmState || {};
       setRepos(Array.isArray(repos) ? repos : []);
       if (appState?.locale) setLocale(normalizeLocale(appState.locale));
+      if (appState?.appearance) setAppearance(normalizeAppearance(appState.appearance));
       if (wp?.path) {
         setWallpaper(normalizeWallpaper(wp));
         window.ghApi.readImage(wp.path).then((dataUrl) => {
@@ -181,6 +186,22 @@ export default function ProjectManager() {
       }
       setStateLoaded(true);
     });
+  }, []);
+
+  useEffect(() => {
+    applyAppearanceToDocument(appearance, resolvedTheme);
+  }, [appearance, resolvedTheme]);
+
+  useEffect(() => {
+    const reloadAppearance = () => {
+      if (!window.ghApi?.loadAppState) return;
+      window.ghApi.loadAppState().then((appState) => {
+        if (appState?.locale) setLocale(normalizeLocale(appState.locale));
+        if (appState?.appearance) setAppearance(normalizeAppearance(appState.appearance));
+      }).catch(() => {});
+    };
+    window.addEventListener("focus", reloadAppearance);
+    return () => window.removeEventListener("focus", reloadAppearance);
   }, []);
 
   const handleAuthSuccess = async () => {
@@ -219,7 +240,7 @@ export default function ProjectManager() {
           height: "100vh",
           background: "var(--pane-background)",
           color: "var(--text-faint)",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "var(--font-ui)",
           fontSize: 14,
         }}
       >
@@ -240,7 +261,7 @@ export default function ProjectManager() {
           height: "100vh",
           gap: 16,
           background: "var(--pane-background)",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "var(--font-ui)",
         }}
       >
         <GitHubIcon size={48} />
@@ -263,7 +284,7 @@ export default function ProjectManager() {
             background: "var(--control-bg-active)",
             color: "var(--text-primary)",
             fontSize: 13,
-            fontFamily: "system-ui, sans-serif",
+            fontFamily: "var(--font-ui)",
             cursor: "pointer",
           }}
         >
@@ -291,7 +312,7 @@ export default function ProjectManager() {
         overflow: "hidden",
         background: "var(--pane-background)",
         color: "var(--text-secondary)",
-        fontFamily: "system-ui, sans-serif",
+        fontFamily: "var(--font-ui)",
         position: "relative",
       }}
     >
@@ -356,7 +377,7 @@ export default function ProjectManager() {
           <span
             style={{
               fontSize: 12,
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono)",
               color: "var(--text-muted)",
               letterSpacing: ".08em",
             }}
@@ -433,7 +454,7 @@ export default function ProjectManager() {
               border: "none",
               cursor: "pointer",
               fontSize: 10,
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: "var(--font-mono)",
               color: "var(--text-faint)",
               letterSpacing: ".08em",
               padding: 0,
@@ -501,7 +522,7 @@ export default function ProjectManager() {
               boxShadow: "var(--pane-interaction-hover-shadow, none)",
               borderRadius: 6, padding: "4px 10px", cursor: "pointer",
               color: "var(--text-muted)", fontSize: 11,
-              fontFamily: "'JetBrains Mono', monospace", letterSpacing: ".04em",
+              fontFamily: "var(--font-mono)", letterSpacing: ".04em",
                   marginRight: 8, transition: "background .15s, color .15s, box-shadow .15s, backdrop-filter .15s",
                 }}
               >

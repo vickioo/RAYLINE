@@ -686,7 +686,7 @@ function AttachmentPicker({ attachments, onChange }) {
         alignItems: "center",
         gap: 4,
         fontSize: 11,
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "var(--font-mono)",
         transition: "color .2s",
       }}
     >
@@ -787,7 +787,7 @@ function DispatchDropdown({
         borderRadius: 6,
         color: selected ? "var(--text-secondary)" : "var(--text-muted)",
         fontSize: 10,
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         letterSpacing: ".06em",
         cursor: "pointer",
         outline: "none",
@@ -802,7 +802,7 @@ function DispatchDropdown({
         borderRadius: 7,
         color: selected ? "var(--text-secondary)" : "var(--text-muted)",
         fontSize: fullWidth ? 11 : 10,
-        fontFamily: "'JetBrains Mono',monospace",
+        fontFamily: "var(--font-mono)",
         letterSpacing: ".06em",
         cursor: "pointer",
         width: fullWidth ? "100%" : "auto",
@@ -863,7 +863,7 @@ function DispatchDropdown({
             <div key={groupLabel || `g${gi}`}>
               {gi > 0 && <div style={{ height: 1, background: "var(--control-bg)", margin: "4px 8px" }} />}
               {groupLabel && (
-                <div style={{ padding: gi === 0 ? "6px 10px 2px" : "4px 10px 2px", fontSize: 8, color: "var(--text-disabled)", letterSpacing: ".12em", fontFamily: "'JetBrains Mono',monospace", textTransform: "uppercase" }}>
+                <div style={{ padding: gi === 0 ? "6px 10px 2px" : "4px 10px 2px", fontSize: 8, color: "var(--text-disabled)", letterSpacing: ".12em", fontFamily: "var(--font-mono)", textTransform: "uppercase" }}>
                   {groupLabel}
                 </div>
               )}
@@ -879,7 +879,7 @@ function DispatchDropdown({
                     border: "none", borderRadius: 7,
                     color: opt.value === value ? "var(--text-primary)" : "var(--text-secondary)",
                     fontSize: 11,
-                    fontFamily: "'JetBrains Mono',monospace",
+                    fontFamily: "var(--font-mono)",
                     cursor: "pointer", textAlign: "left",
                     transition: "background .12s, color .12s",
                   }}
@@ -976,7 +976,7 @@ const cardStyle = {
   WebkitBackdropFilter: "blur(48px) saturate(1.2)",
   border: "1px solid var(--pane-border)",
   borderRadius: 12, display: "flex", flexDirection: "column",
-  color: "var(--text-primary)", fontFamily: "system-ui, sans-serif", fontSize: 13,
+  color: "var(--text-primary)", fontFamily: "var(--font-ui)", fontSize: 13,
   boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
 };
 const headerStyle = {
@@ -1039,7 +1039,7 @@ const addBtnStyle = {
   borderRadius: 6,
   marginTop: 2,
   cursor: "pointer", fontSize: 11,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: "var(--font-mono)",
   letterSpacing: ".06em",
   transition: "color .15s, background .15s",
 };
@@ -1047,7 +1047,7 @@ const addBtnStyle = {
 const autoNoteStyle = {
   color: "var(--text-secondary)",
   fontSize: 11,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: "var(--font-mono)",
   marginBottom: 10,
   minWidth: 0,
   overflow: "hidden",
@@ -1155,7 +1155,7 @@ const customBranchStyle = {
   border: "none",
   padding: "4px 0",
   fontSize: 10,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: "var(--font-mono)",
   letterSpacing: ".06em",
   outline: "none",
 };
