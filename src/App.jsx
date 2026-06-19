@@ -25,6 +25,7 @@ import { resolveSafeCwd, buildMissingCwdReminder, decoratePromptWithReminder, ge
 import { FontSizeContext } from "./contexts/FontSizeContext";
 import { applyAppearanceToDocument, applyAppearanceWindowBackground, normalizeAppearance } from "./utils/appearance";
 import { getPaneSurfaceStyle } from "./utils/paneSurface";
+import { COMPACT_EDGE_INSET } from "./utils/compactLayout";
 import { DEFAULT_WALLPAPER, getPersistedWallpaper, getWallpaperImageFilter, normalizeWallpaper } from "./utils/wallpaper";
 import { detectDefaultLocale, normalizeLocale } from "./i18n";
 import { createLogger } from "./utils/logger";
@@ -1604,6 +1605,7 @@ export default function App() {
   );
   const hasNativeBridge = typeof window !== "undefined" && Boolean(window.api);
   const rightAlignedChromeRail = isCompactViewport || !hasNativeBridge;
+  const chromeRailRightInset = isCompactViewport ? COMPACT_EDGE_INSET : 24;
 
   useEffect(() => {
     if (!window.api?.onAgentPermissionRequest) return undefined;
@@ -4084,6 +4086,7 @@ export default function App() {
           settingsOpen={showSettings}
           controlsOnHover={isCompactViewport ? false : chromeControlsOnHover}
           rightAligned={rightAlignedChromeRail}
+          rightInset={chromeRailRightInset}
           onToggleSidebar={() => setSidebarOpen((o) => !o)}
           onNew={handleNew}
           onOpenSettings={() => setShowSettings((open) => !open)}

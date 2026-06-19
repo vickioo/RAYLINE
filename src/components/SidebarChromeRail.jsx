@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { PanelLeftClose, PanelLeftOpen, Plus, Settings } from "lucide-react";
 import {
+  MINI_ICON_BUTTON_HEIGHT,
+  MINI_ICON_BUTTON_WIDTH,
+  MINI_ICON_SIZE,
+  MINI_ICON_STROKE_WIDTH,
+} from "../utils/compactLayout";
+import {
   SIDEBAR_CHROME_RAIL_HEIGHT,
   SIDEBAR_CHROME_RAIL_LEFT,
   SIDEBAR_CHROME_RAIL_TOP,
@@ -23,8 +29,8 @@ function RailButton({ label, onClick, active = false, visible = true, children }
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        width: 28,
-        height: 26,
+        width: MINI_ICON_BUTTON_WIDTH,
+        height: MINI_ICON_BUTTON_HEIGHT,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -59,9 +65,10 @@ function RailButton({ label, onClick, active = false, visible = true, children }
   );
 }
 
-export default function SidebarChromeRail({ sidebarOpen, settingsOpen, controlsOnHover = false, rightAligned = false, onToggleSidebar, onNew, onOpenSettings }) {
+export default function SidebarChromeRail({ sidebarOpen, settingsOpen, controlsOnHover = false, rightAligned = false, rightInset = 12, onToggleSidebar, onNew, onOpenSettings }) {
   const [railHovered, setRailHovered] = useState(false);
   const controlsVisible = !controlsOnHover || railHovered;
+  const railWidth = MINI_ICON_BUTTON_WIDTH * 3;
 
   return (
     <div
@@ -73,9 +80,9 @@ export default function SidebarChromeRail({ sidebarOpen, settingsOpen, controlsO
         position: "fixed",
         top: rightAligned ? 12 : SIDEBAR_CHROME_RAIL_TOP,
         left: rightAligned ? "auto" : SIDEBAR_CHROME_RAIL_LEFT,
-        right: rightAligned ? 12 : "auto",
+        right: rightAligned ? rightInset : "auto",
         zIndex: 1000,
-        width: SIDEBAR_CHROME_RAIL_WIDTH,
+        width: rightAligned ? railWidth : SIDEBAR_CHROME_RAIL_WIDTH,
         height: SIDEBAR_CHROME_RAIL_HEIGHT,
         display: "flex",
         alignItems: "center",
@@ -95,18 +102,18 @@ export default function SidebarChromeRail({ sidebarOpen, settingsOpen, controlsO
         visible={controlsVisible}
       >
         {sidebarOpen ? (
-          <PanelLeftClose size={15} strokeWidth={1.55} />
+          <PanelLeftClose size={MINI_ICON_SIZE} strokeWidth={MINI_ICON_STROKE_WIDTH} />
         ) : (
-          <PanelLeftOpen size={15} strokeWidth={1.55} />
+          <PanelLeftOpen size={MINI_ICON_SIZE} strokeWidth={MINI_ICON_STROKE_WIDTH} />
         )}
       </RailButton>
 
       <RailButton label="New chat" onClick={onNew} visible={controlsVisible}>
-        <Plus size={15} strokeWidth={1.6} />
+        <Plus size={MINI_ICON_SIZE} strokeWidth={MINI_ICON_STROKE_WIDTH} />
       </RailButton>
 
       <RailButton label={settingsOpen ? "Close settings" : "Settings"} onClick={onOpenSettings} active={settingsOpen} visible={controlsVisible}>
-        <Settings size={14} strokeWidth={1.55} />
+        <Settings size={MINI_ICON_SIZE} strokeWidth={MINI_ICON_STROKE_WIDTH} />
       </RailButton>
     </div>
   );

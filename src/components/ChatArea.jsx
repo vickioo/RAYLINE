@@ -17,6 +17,14 @@ import { useFontScale } from "../contexts/FontSizeContext";
 import { IS_MAC, SIDEBAR_CHROME_RAIL_LEFT, SIDEBAR_CHROME_RAIL_WIDTH } from "../windowChrome";
 import { getPaneSurfaceStyle } from "../utils/paneSurface";
 import { clipboardItemsToAttachments, dataTransferHasFiles, fileListToAttachments } from "../utils/attachments";
+import {
+  COMPACT_CONTENT_WIDTH,
+  COMPACT_EDGE_INSET,
+  MINI_ICON_BUTTON_HEIGHT,
+  MINI_ICON_BUTTON_WIDTH,
+  MINI_ICON_SIZE,
+  MINI_ICON_STROKE_WIDTH,
+} from "../utils/compactLayout";
 import TabStrip from "./TabStrip";
 import useGitStatus from "../hooks/useGitStatus";
 import { isMulticaModelId } from "../data/models";
@@ -392,19 +400,23 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
 
   const showHeaderTabs = tabs.length > 0 && !showNewChatCard;
   const showConversationTitle = Boolean(convo && !showNewChatCard);
-  const compactHeaderControlsRight = windowControlsVisible ? 126 : 12;
+  const compactHeaderControlsRight = windowControlsVisible ? 126 : COMPACT_EDGE_INSET;
   const topTabsLeft = compactViewport
-    ? 12
+    ? COMPACT_EDGE_INSET
     : sidebarOpen
     ? 18
     : IS_MAC
       ? SIDEBAR_CHROME_RAIL_LEFT + SIDEBAR_CHROME_RAIL_WIDTH + 16
       : 18;
-  const topTabsRight = compactViewport ? 124 : (windowControlsVisible ? 126 : 24);
+  const topTabsRight = compactViewport
+    ? (windowControlsVisible ? 126 : `calc(${COMPACT_EDGE_INSET} + ${MINI_ICON_BUTTON_WIDTH * 3 + 12}px)`)
+    : (windowControlsVisible ? 126 : 24);
   const headerContentOffset = compactViewport ? (showHeaderTabs ? 44 : 36) : (showHeaderTabs ? 8 : 0);
-  const headerLeftPadding = compactViewport ? 16 : (sidebarOpen ? 24 : IS_MAC ? 50 : 24);
+  const headerLeftPadding = compactViewport ? COMPACT_EDGE_INSET : (sidebarOpen ? 24 : IS_MAC ? 50 : 24);
   const compactHeaderControlsTop = 52;
-  const compactHeaderControlsMaxWidth = `calc(100vw - ${compactHeaderControlsRight + 16}px)`;
+  const compactHeaderControlsMaxWidth = windowControlsVisible
+    ? "calc(100vw - 142px)"
+    : `calc(100vw - ${COMPACT_EDGE_INSET} - ${COMPACT_EDGE_INSET})`;
 
   const renderHeaderControls = (style) => (
     <div
@@ -449,8 +461,8 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
             alignItems: "center",
             justifyContent: "center",
             gap: 4,
-            width: terminalCount > 0 ? "auto" : 26,
-            height: 23,
+            width: terminalCount > 0 ? "auto" : MINI_ICON_BUTTON_WIDTH,
+            height: MINI_ICON_BUTTON_HEIGHT,
             padding: terminalCount > 0 ? "0 8px" : 0,
             borderRadius: 7,
             background: terminalOpen ? "var(--control-bg-active)" : "var(--control-bg)",
@@ -462,7 +474,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
           onMouseEnter={(e) => { e.currentTarget.style.background = "var(--control-bg-active)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = terminalOpen ? "var(--control-bg-active)" : "var(--control-bg)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
         >
-          <TerminalIcon size={14} strokeWidth={1.5} />
+          <TerminalIcon size={MINI_ICON_SIZE} strokeWidth={MINI_ICON_STROKE_WIDTH} />
           {terminalCount > 0 && (
             <span style={{
               fontSize: s(10),
@@ -669,7 +681,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
       {/* Top bar — aligns with sidebar header */}
       <div
         style={{
-          padding: `${headerContentOffset}px ${compactViewport ? 12 : 24}px 12px ${headerLeftPadding}px`,
+          padding: `${headerContentOffset}px ${compactViewport ? COMPACT_EDGE_INSET : 24}px 12px ${headerLeftPadding}px`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -740,7 +752,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: compactViewport ? "22px 14px" : "32px 28px",
+          padding: compactViewport ? `22px ${COMPACT_EDGE_INSET}` : "32px 28px",
           display: "flex",
           flexDirection: "column",
         }}
@@ -825,12 +837,12 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
       {!showNewChatCard &&
       <div
         style={{
-          padding: compactViewport ? "10px 12px 14px" : "12px 28px 24px",
+          padding: compactViewport ? `10px ${COMPACT_EDGE_INSET} 14px` : "12px 28px 24px",
           display: "flex",
           justifyContent: "center",
         }}
       >
-        <div style={{ width: "100%", maxWidth: compactViewport ? "none" : 560, minWidth: 0 }}>
+        <div data-rayline-composer style={{ width: "100%", maxWidth: COMPACT_CONTENT_WIDTH, minWidth: 0 }}>
           {permissionRequests && permissionRequests.length > 0 && (
             <div style={{ marginBottom: 8 }}>
               {permissionRequests.map((req) => {

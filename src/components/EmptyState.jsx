@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useFontScale } from "../contexts/FontSizeContext";
+import { COMPACT_CONTENT_WIDTH } from "../utils/compactLayout";
 
 const LOGO_RED = "var(--brand-logo-red, #FF4422)";
 const PRIMARY = "var(--text-secondary)";
@@ -66,9 +67,10 @@ export default function EmptyState() {
       {/* R/YLINE. lockup */}
       <svg
         className="rl-lockup"
+        data-rayline-logo
         viewBox="0 0 497 150"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ width: "min(420px, 86vw)", height: "auto", maxHeight: 126, overflow: "visible" }}
+        style={{ width: COMPACT_CONTENT_WIDTH, height: "auto", maxHeight: 126, overflow: "visible" }}
         aria-label="RayLine"
       >
         <g fill={PRIMARY} fontFamily="var(--font-ui)" fontWeight="600" fontSize="100">
