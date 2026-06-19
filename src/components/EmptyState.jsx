@@ -68,7 +68,7 @@ export default function EmptyState() {
         className="rl-lockup"
         viewBox="0 0 497 150"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ width: 420, height: 126, overflow: "visible" }}
+        style={{ width: "min(420px, 86vw)", height: "auto", maxHeight: 126, overflow: "visible" }}
         aria-label="RayLine"
       >
         <g fill={PRIMARY} fontFamily="var(--font-ui)" fontWeight="600" fontSize="100">

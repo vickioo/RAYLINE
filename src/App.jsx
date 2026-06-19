@@ -8,6 +8,7 @@ import TerminalDrawer from "./components/TerminalDrawer";
 import WindowControls from "./components/WindowControls";
 import useAgent     from "./hooks/useAgent";
 import useTerminal  from "./hooks/useTerminal";
+import useCompactViewport from "./hooks/useCompactViewport";
 import { usePrefersReducedMotion } from "./hooks/useWindowActivity";
 import Settings     from "./components/Settings";
 import MulticaSetupModal from "./components/MulticaSetupModal";
@@ -1282,6 +1283,7 @@ export default function App() {
   const [developerMode, setDeveloperMode] = useState(true);
   const [sidebarTerminalEnabled, setSidebarTerminalEnabled] = useState(false);
   const [sidebarTerminalOpen, setSidebarTerminalOpen] = useState(false);
+  const isCompactViewport = useCompactViewport();
   const [remoteSshCommand, setRemoteSshCommand] = useState("");
   const [remoteSshRuntime, setRemoteSshRuntime] = useState(() => normalizeRemoteSshRuntime(null));
   const [chromeControlsOnHover, setChromeControlsOnHover] = useState(false);
@@ -1578,7 +1580,13 @@ export default function App() {
   );
   const showWindowControls = platform === "win32";
   const useWindowsSidebarChrome = showWindowControls;
-  const sidebarWidth = sidebarOpen ? (useWindowsSidebarChrome ? 220 : SIDEBAR_WIDTH) : 0;
+  const sidebarWidth = isCompactViewport
+    ? 0
+    : (sidebarOpen ? (useWindowsSidebarChrome ? 220 : SIDEBAR_WIDTH) : 0);
+
+  useEffect(() => {
+    if (isCompactViewport) setSidebarOpen(false);
+  }, [isCompactViewport]);
 
   useEffect(() => {
     window.api?.getSystemInfo?.().then((info) => {
@@ -4009,6 +4017,11 @@ export default function App() {
     };
   }, []);
 
+  const handleSidebarSelect = useCallback(async (id) => {
+    await handleSelect(id);
+    if (isCompactViewport) setSidebarOpen(false);
+  }, [handleSelect, isCompactViewport]);
+
   // ── Render ─────────────────────────────────────────────────────────────────
   const sidebarPaneTransition = prefersReducedMotion
     ? "none"
@@ -4067,7 +4080,7 @@ export default function App() {
         <SidebarChromeRail
           sidebarOpen={sidebarOpen}
           settingsOpen={showSettings}
-          controlsOnHover={chromeControlsOnHover}
+          controlsOnHover={isCompactViewport ? false : chromeControlsOnHover}
           onToggleSidebar={() => setSidebarOpen((o) => !o)}
           onNew={handleNew}
           onOpenSettings={() => setShowSettings((open) => !open)}
@@ -4082,42 +4095,65 @@ export default function App() {
           height: "100%",
         }}
       >
+      {isCompactViewport && sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 20,
+            border: "none",
+            padding: 0,
+            background: "rgba(0,0,0,0.36)",
+            WebkitAppRegion: "no-drag",
+          }}
+        />
+      )}
+
       {/* Sidebar */}
       <div
         style={{
-          width: sidebarWidth,
-          minWidth: sidebarWidth,
+          width: isCompactViewport ? Math.min(SIDEBAR_WIDTH, 320) : sidebarWidth,
+          minWidth: isCompactViewport ? Math.min(SIDEBAR_WIDTH, 320) : sidebarWidth,
+          maxWidth: isCompactViewport ? "86vw" : undefined,
           borderRight: `1px solid ${sidebarOpen ? "rgba(255,255,255,0.025)" : "rgba(255,255,255,0)"}`,
           display: "flex",
           flexDirection: "column",
-          position: "relative",
-          zIndex: 10,
+          position: isCompactViewport ? "fixed" : "relative",
+          inset: isCompactViewport ? "0 auto 0 0" : undefined,
+          zIndex: isCompactViewport ? 30 : 10,
           flexShrink: 0,
           ...getPaneSurfaceStyle(Boolean(wallpaper?.dataUrl), {
             hoverOpacity: clampNumber(sidebarActiveOpacity * 0.6, 0.8, sidebarActiveOpacity),
             activeOpacity: sidebarActiveOpacity,
           }),
           backdropFilter: wallpaper?.dataUrl ? "saturate(1.1)" : "none",
-          transition: sidebarPaneTransition,
+          transition: isCompactViewport
+            ? "transform .22s cubic-bezier(.16,1,.3,1), border-color .18s ease"
+            : sidebarPaneTransition,
+          transform: isCompactViewport && !sidebarOpen ? "translateX(-104%)" : "translateX(0)",
+          pointerEvents: !isCompactViewport || sidebarOpen ? "auto" : "none",
           overflow: "hidden",
         }}
       >
         <div
           aria-hidden={!useWindowsSidebarChrome && !sidebarOpen}
           style={{
-            width: useWindowsSidebarChrome ? "100%" : SIDEBAR_WIDTH,
-            minWidth: useWindowsSidebarChrome ? "100%" : SIDEBAR_WIDTH,
+            width: isCompactViewport || useWindowsSidebarChrome ? "100%" : SIDEBAR_WIDTH,
+            minWidth: isCompactViewport || useWindowsSidebarChrome ? "100%" : SIDEBAR_WIDTH,
             height: "100%",
-            opacity: sidebarOpen ? 1 : 0,
-            transform: sidebarOpen ? "translateX(0)" : "translateX(-12px)",
+            opacity: isCompactViewport ? 1 : (sidebarOpen ? 1 : 0),
+            transform: isCompactViewport || sidebarOpen ? "translateX(0)" : "translateX(-12px)",
             transition: sidebarContentTransition,
-            pointerEvents: useWindowsSidebarChrome || sidebarOpen ? "auto" : "none",
+            pointerEvents: isCompactViewport || useWindowsSidebarChrome || sidebarOpen ? "auto" : "none",
           }}
         >
           <Sidebar
             convos={convosForSidebar}
             active={active}
-            onSelect={handleSelect}
+            onSelect={handleSidebarSelect}
             onNew={handleNew}
             onOpenDispatch={() => setShowDispatchCard(true)}
             onDelete={handleDelete}
@@ -4231,6 +4267,7 @@ export default function App() {
           canControlTarget={canControlTarget}
           developerMode={developerMode}
           windowControlsVisible={showWindowControls}
+          compactViewport={isCompactViewport}
           locale={locale}
           runtimeSetup={runtimeSetup}
           extraModels={remoteModels}

@@ -121,7 +121,7 @@ const ChatTranscript = memo(function ChatTranscript({
   );
 });
 
-export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen, onModelChange, defaultModel, queuedMessages, onUpdateQueuedMessage, onRemoveQueuedMessage, permissionRequests, onRespondPermission, onToggleTerminal, terminalOpen, terminalCount, wallpaper, cwd, draftsPath, onCwdChange, onRefocusTerminal, showNewChatCard, onCreateChat, onCancelNewChat, allCwdRoots, projects, defaultPrBranch, newChatDefaultCwd, coauthorEnabled = false, coauthorTrailer = "", onControlChange, canControlTarget, developerMode = true, tabs = [], activeTabId = null, onSelectTab, onCloseTab, windowControlsVisible = false, locale, runtimeSetup = null, extraModels = [] }) {
+export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen, onModelChange, defaultModel, queuedMessages, onUpdateQueuedMessage, onRemoveQueuedMessage, permissionRequests, onRespondPermission, onToggleTerminal, terminalOpen, terminalCount, wallpaper, cwd, draftsPath, onCwdChange, onRefocusTerminal, showNewChatCard, onCreateChat, onCancelNewChat, allCwdRoots, projects, defaultPrBranch, newChatDefaultCwd, coauthorEnabled = false, coauthorTrailer = "", onControlChange, canControlTarget, developerMode = true, tabs = [], activeTabId = null, onSelectTab, onCloseTab, windowControlsVisible = false, compactViewport = false, locale, runtimeSetup = null, extraModels = [] }) {
   const s = useFontScale();
   const t = createTranslator(locale);
   const isDraftContext = showNewChatCard ? newChatDefaultCwd == null : isDraftConversation(convo, draftsPath);
@@ -392,14 +392,16 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
 
   const showHeaderTabs = tabs.length > 0 && !showNewChatCard;
   const showConversationTitle = Boolean(convo && !showNewChatCard);
-  const topTabsLeft = sidebarOpen
+  const topTabsLeft = compactViewport
+    ? 16
+    : sidebarOpen
     ? 18
     : IS_MAC
       ? SIDEBAR_CHROME_RAIL_LEFT + SIDEBAR_CHROME_RAIL_WIDTH + 16
       : 18;
-  const topTabsRight = windowControlsVisible ? 126 : 24;
-  const headerContentOffset = showHeaderTabs ? 8 : 0;
-  const headerLeftPadding = sidebarOpen ? 24 : IS_MAC ? 50 : 24;
+  const topTabsRight = compactViewport ? 16 : (windowControlsVisible ? 126 : 24);
+  const headerContentOffset = compactViewport ? (showHeaderTabs ? 44 : 36) : (showHeaderTabs ? 8 : 0);
+  const headerLeftPadding = compactViewport ? 16 : (sidebarOpen ? 24 : IS_MAC ? 50 : 24);
 
   const handleDragEnter = useCallback((e) => {
     if (!dataTransferHasFiles(e.dataTransfer)) return;
@@ -580,7 +582,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
       {/* Top bar — aligns with sidebar header */}
       <div
         style={{
-          padding: `${headerContentOffset}px 24px 12px ${headerLeftPadding}px`,
+          padding: `${headerContentOffset}px ${compactViewport ? 12 : 24}px 12px ${headerLeftPadding}px`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -591,6 +593,8 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          flexWrap: compactViewport ? "wrap" : "nowrap",
+          gap: compactViewport ? 10 : 0,
           width: "100%",
           maxWidth: "none",
         }}>
@@ -601,7 +605,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
             gap: 12,
             WebkitAppRegion: "no-drag",
             minWidth: 0,
-            flex: 1,
+            flex: compactViewport ? "1 1 100%" : 1,
           }}
         >
           {showConversationTitle && (
@@ -633,7 +637,19 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
           )}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 8, WebkitAppRegion: "no-drag" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            WebkitAppRegion: "no-drag",
+            minWidth: 0,
+            maxWidth: "100%",
+            overflowX: compactViewport ? "auto" : "visible",
+            scrollbarWidth: compactViewport ? "none" : undefined,
+            paddingBottom: compactViewport ? 2 : 0,
+          }}
+        >
           {!showNewChatCard && developerMode && !isDraftContext && (
             <MemoGitStatusPill
               cwd={cwd}
@@ -700,7 +716,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
         style={{
           flex: 1,
           overflowY: "auto",
-          padding: "32px 28px",
+          padding: compactViewport ? "22px 14px" : "32px 28px",
           display: "flex",
           flexDirection: "column",
         }}
@@ -784,9 +800,13 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
       {/* Input bar */}
       {!showNewChatCard &&
       <div
-        style={{ padding: "12px 28px 24px", display: "flex", justifyContent: "center" }}
+        style={{
+          padding: compactViewport ? "10px 12px 14px" : "12px 28px 24px",
+          display: "flex",
+          justifyContent: "center",
+        }}
       >
-        <div style={{ width: "100%", maxWidth: 560 }}>
+        <div style={{ width: "100%", maxWidth: compactViewport ? "none" : 560, minWidth: 0 }}>
           {permissionRequests && permissionRequests.length > 0 && (
             <div style={{ marginBottom: 8 }}>
               {permissionRequests.map((req) => {
@@ -813,7 +833,8 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
                     key={req.requestId}
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: compactViewport ? "stretch" : "center",
+                      flexWrap: compactViewport ? "wrap" : "nowrap",
                       gap: 8,
                       padding: "6px 8px",
                       marginBottom: 4,
@@ -861,7 +882,15 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
                         {summary}
                       </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        flexShrink: 0,
+                        flexWrap: compactViewport ? "wrap" : "nowrap",
+                      }}
+                    >
                       <button
                         onClick={() => onRespondPermission?.({ requestId: req.requestId, behavior: "allow", scope: "once" })}
                         style={{
@@ -918,7 +947,8 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
                     key={q.id || i}
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: compactViewport ? "stretch" : "center",
+                      flexWrap: compactViewport ? "wrap" : "nowrap",
                       gap: 8,
                       padding: "6px 8px",
                       marginBottom: 4,
@@ -1000,6 +1030,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
                         alignItems: "center",
                         gap: 4,
                         flexShrink: 0,
+                        flexWrap: compactViewport ? "wrap" : "nowrap",
                       }}
                     >
                       {isEditingQueueItem ? (
@@ -1129,6 +1160,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
               ),
               borderRadius: 12,
               padding: shellMode ? "8px 13px" : "9px 14px",
+              minWidth: 0,
               backdropFilter: "blur(20px)",
               boxShadow: dragOver ? "0 0 0 1px rgba(153,214,255,0.08)" : "none",
               transition: "border-color .25s, background .25s, box-shadow .25s",
@@ -1151,6 +1183,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
               rows={1}
               style={{
                 flex: 1,
+                minWidth: 0,
                 background: "transparent",
                 border: "none",
                 resize: "none",
