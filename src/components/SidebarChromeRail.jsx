@@ -59,26 +59,28 @@ function RailButton({ label, onClick, active = false, visible = true, children }
   );
 }
 
-export default function SidebarChromeRail({ sidebarOpen, settingsOpen, controlsOnHover = false, onToggleSidebar, onNew, onOpenSettings }) {
+export default function SidebarChromeRail({ sidebarOpen, settingsOpen, controlsOnHover = false, rightAligned = false, onToggleSidebar, onNew, onOpenSettings }) {
   const [railHovered, setRailHovered] = useState(false);
   const controlsVisible = !controlsOnHover || railHovered;
 
   return (
     <div
       aria-label="Window controls"
+      data-rayline-chrome-rail
       onMouseEnter={() => setRailHovered(true)}
       onMouseLeave={() => setRailHovered(false)}
       style={{
         position: "fixed",
-        top: SIDEBAR_CHROME_RAIL_TOP,
-        left: SIDEBAR_CHROME_RAIL_LEFT,
+        top: rightAligned ? 12 : SIDEBAR_CHROME_RAIL_TOP,
+        left: rightAligned ? "auto" : SIDEBAR_CHROME_RAIL_LEFT,
+        right: rightAligned ? 12 : "auto",
         zIndex: 1000,
         width: SIDEBAR_CHROME_RAIL_WIDTH,
         height: SIDEBAR_CHROME_RAIL_HEIGHT,
         display: "flex",
-        alignItems: "right",
-        justifyContent: "right",
-        gap: 0.1,
+        alignItems: "center",
+        justifyContent: "flex-end",
+        gap: 0,
         pointerEvents: controlsOnHover ? "auto" : "none",
         WebkitAppRegion: "no-drag",
         userSelect: "none",

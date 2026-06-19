@@ -1602,6 +1602,8 @@ export default function App() {
     () => permissionRequests.filter((item) => item?.conversationId === active),
     [active, permissionRequests]
   );
+  const hasNativeBridge = typeof window !== "undefined" && Boolean(window.api);
+  const rightAlignedChromeRail = isCompactViewport || !hasNativeBridge;
 
   useEffect(() => {
     if (!window.api?.onAgentPermissionRequest) return undefined;
@@ -4081,6 +4083,7 @@ export default function App() {
           sidebarOpen={sidebarOpen}
           settingsOpen={showSettings}
           controlsOnHover={isCompactViewport ? false : chromeControlsOnHover}
+          rightAligned={rightAlignedChromeRail}
           onToggleSidebar={() => setSidebarOpen((o) => !o)}
           onNew={handleNew}
           onOpenSettings={() => setShowSettings((open) => !open)}

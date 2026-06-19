@@ -392,16 +392,90 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
 
   const showHeaderTabs = tabs.length > 0 && !showNewChatCard;
   const showConversationTitle = Boolean(convo && !showNewChatCard);
+  const compactHeaderControlsRight = windowControlsVisible ? 126 : 12;
   const topTabsLeft = compactViewport
-    ? 16
+    ? 12
     : sidebarOpen
     ? 18
     : IS_MAC
       ? SIDEBAR_CHROME_RAIL_LEFT + SIDEBAR_CHROME_RAIL_WIDTH + 16
       : 18;
-  const topTabsRight = compactViewport ? 16 : (windowControlsVisible ? 126 : 24);
+  const topTabsRight = compactViewport ? 124 : (windowControlsVisible ? 126 : 24);
   const headerContentOffset = compactViewport ? (showHeaderTabs ? 44 : 36) : (showHeaderTabs ? 8 : 0);
   const headerLeftPadding = compactViewport ? 16 : (sidebarOpen ? 24 : IS_MAC ? 50 : 24);
+  const compactHeaderControlsTop = 52;
+  const compactHeaderControlsMaxWidth = `calc(100vw - ${compactHeaderControlsRight + 16}px)`;
+
+  const renderHeaderControls = (style) => (
+    <div
+      data-rayline-header-controls
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        WebkitAppRegion: "no-drag",
+        ...style,
+      }}
+    >
+      {!showNewChatCard && developerMode && !isDraftContext && (
+        <MemoGitStatusPill
+          cwd={cwd}
+          defaultPrBranch={defaultPrBranch}
+          coauthorEnabled={coauthorEnabled}
+          coauthorTrailer={coauthorTrailer}
+          locale={locale}
+        />
+      )}
+      {!showNewChatCard && developerMode && !isDraftContext && (
+        <MemoBranchSelector
+          cwd={cwd}
+          onCwdChange={onCwdChange}
+          hasMessages={convo?.msgs?.length > 0}
+          onRefocusTerminal={onRefocusTerminal}
+          locale={locale}
+        />
+      )}
+      {!showNewChatCard && <MemoModelPickerWithMultica value={convo?.model || defaultModel || "sonnet"} onChange={onModelChange} extraModels={extraModels} />}
+      {!showNewChatCard && convo?.msgs?.length > 0 && (
+        <MemoExportConversationBtn convo={convo} />
+      )}
+      {!showNewChatCard && developerMode && onToggleTerminal && (
+        <button
+          type="button"
+          onClick={onToggleTerminal}
+          title={t("chatArea.toggleTerminal")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 4,
+            width: terminalCount > 0 ? "auto" : 26,
+            height: 23,
+            padding: terminalCount > 0 ? "0 8px" : 0,
+            borderRadius: 7,
+            background: terminalOpen ? "var(--control-bg-active)" : "var(--control-bg)",
+            border: "1px solid " + (terminalOpen ? "var(--control-border-strong)" : "var(--pane-border)"),
+            color: terminalOpen ? "var(--text-secondary)" : "var(--text-secondary)",
+            cursor: "pointer",
+            transition: "all .2s",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "var(--control-bg-active)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = terminalOpen ? "var(--control-bg-active)" : "var(--control-bg)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
+        >
+          <TerminalIcon size={14} strokeWidth={1.5} />
+          {terminalCount > 0 && (
+            <span style={{
+              fontSize: s(10),
+              fontFamily: "var(--font-mono)",
+              color: "inherit",
+            }}>
+              {terminalCount}
+            </span>
+          )}
+        </button>
+      )}
+    </div>
+  );
 
   const handleDragEnter = useCallback((e) => {
     if (!dataTransferHasFiles(e.dataTransfer)) return;
@@ -579,6 +653,19 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
         </div>
       )}
 
+      {compactViewport && renderHeaderControls({
+        position: "absolute",
+        top: compactHeaderControlsTop,
+        right: compactHeaderControlsRight,
+        zIndex: 45,
+        justifyContent: "flex-end",
+        minWidth: 0,
+        maxWidth: compactHeaderControlsMaxWidth,
+        overflowX: "auto",
+        scrollbarWidth: "none",
+        paddingBottom: 2,
+      })}
+
       {/* Top bar — aligns with sidebar header */}
       <div
         style={{
@@ -593,8 +680,7 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          flexWrap: compactViewport ? "wrap" : "nowrap",
-          gap: compactViewport ? 10 : 0,
+          gap: 0,
           width: "100%",
           maxWidth: "none",
         }}>
@@ -605,7 +691,8 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
             gap: 12,
             WebkitAppRegion: "no-drag",
             minWidth: 0,
-            flex: compactViewport ? "1 1 100%" : 1,
+            flex: 1,
+            paddingRight: compactViewport ? 150 : 0,
           }}
         >
           {showConversationTitle && (
@@ -637,76 +724,13 @@ export default function ChatArea({ convo, onSend, onCancel, onEdit, sidebarOpen,
           )}
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            WebkitAppRegion: "no-drag",
-            minWidth: 0,
-            maxWidth: "100%",
-            overflowX: compactViewport ? "auto" : "visible",
-            scrollbarWidth: compactViewport ? "none" : undefined,
-            paddingBottom: compactViewport ? 2 : 0,
-          }}
-        >
-          {!showNewChatCard && developerMode && !isDraftContext && (
-            <MemoGitStatusPill
-              cwd={cwd}
-              defaultPrBranch={defaultPrBranch}
-              coauthorEnabled={coauthorEnabled}
-              coauthorTrailer={coauthorTrailer}
-              locale={locale}
-            />
-          )}
-          {!showNewChatCard && developerMode && !isDraftContext && (
-            <MemoBranchSelector
-              cwd={cwd}
-              onCwdChange={onCwdChange}
-              hasMessages={convo?.msgs?.length > 0}
-              onRefocusTerminal={onRefocusTerminal}
-              locale={locale}
-            />
-          )}
-          {!showNewChatCard && <MemoModelPickerWithMultica value={convo?.model || defaultModel || "sonnet"} onChange={onModelChange} extraModels={extraModels} />}
-          {!showNewChatCard && convo?.msgs?.length > 0 && (
-            <MemoExportConversationBtn convo={convo} />
-          )}
-          {!showNewChatCard && developerMode && onToggleTerminal && (
-            <button
-              onClick={onToggleTerminal}
-              title={t("chatArea.toggleTerminal")}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 4,
-                width: terminalCount > 0 ? "auto" : 26,
-                height: 23,
-                padding: terminalCount > 0 ? "0 8px" : 0,
-                borderRadius: 7,
-                background: terminalOpen ? "var(--control-bg-active)" : "var(--control-bg)",
-                border: "1px solid " + (terminalOpen ? "var(--control-border-strong)" : "var(--pane-border)"),
-                color: terminalOpen ? "var(--text-secondary)" : "var(--text-secondary)",
-                cursor: "pointer",
-                transition: "all .2s",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--control-bg-active)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = terminalOpen ? "var(--control-bg-active)" : "var(--control-bg)"; e.currentTarget.style.color = "var(--text-secondary)"; }}
-            >
-              <TerminalIcon size={14} strokeWidth={1.5} />
-              {terminalCount > 0 && (
-                <span style={{
-                  fontSize: s(10),
-                  fontFamily: "var(--font-mono)",
-                  color: "inherit",
-                }}>
-                  {terminalCount}
-                </span>
-              )}
-            </button>
-          )}
-        </div>
+        {!compactViewport && renderHeaderControls({
+          minWidth: 0,
+          maxWidth: "100%",
+          overflowX: "visible",
+          paddingBottom: 0,
+          marginLeft: "auto",
+        })}
         </div>
       </div>
 
