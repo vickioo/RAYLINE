@@ -1,10 +1,16 @@
 import { useState, useRef, useEffect, useCallback, forwardRef } from "react";
 import { createPortal } from "react-dom";
-import { Paperclip, X, GitBranch, GitFork, Link2 } from "lucide-react";
+import { ArrowLeft, Paperclip, X, GitBranch, GitFork, Link2 } from "lucide-react";
 import { ModelPickerWithMultica } from "../data/multicaModels.jsx";
 import ProjectPicker from "./ProjectPicker";
 import { useFontScale } from "../contexts/FontSizeContext";
 import { clipboardItemsToAttachments, dataTransferHasFiles, fileListToAttachments } from "../utils/attachments";
+import {
+  MINI_ICON_BUTTON_HEIGHT,
+  MINI_ICON_BUTTON_WIDTH,
+  MINI_ICON_SIZE,
+  MINI_ICON_STROKE_WIDTH,
+} from "../utils/compactLayout";
 
 const MENU_GAP = 6;
 const VIEWPORT_PADDING = 8;
@@ -67,6 +73,7 @@ export default function NewChatCard({
   const [issueContext, setIssueContext] = useState(null);
   const [error, setError] = useState(null);
   const [creatingChat, setCreatingChat] = useState(false);
+  const [backHover, setBackHover] = useState(false);
 
   // Issue search state
   const [showIssueSearch, setShowIssueSearch] = useState(false);
@@ -110,7 +117,7 @@ export default function NewChatCard({
         if (showIssueSearch) { setShowIssueSearch(false); return; }
         if (showBranchSearch) { setShowBranchSearch(false); return; }
         if (showTreeInput) { setShowTreeInput(false); return; }
-        onCancel();
+        onCancel?.();
       }
     };
     document.addEventListener("keydown", handler);
@@ -511,6 +518,36 @@ export default function NewChatCard({
         maxHeight: "100%",
         overflowY: "auto",
       }}>
+        {onCancel && (
+          <div style={{ display: "flex", alignItems: "center", minHeight: MINI_ICON_BUTTON_HEIGHT }}>
+            <button
+              type="button"
+              aria-label="Back to conversation"
+              title="Back"
+              onClick={onCancel}
+              onMouseEnter={() => setBackHover(true)}
+              onMouseLeave={() => setBackHover(false)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: MINI_ICON_BUTTON_WIDTH,
+                height: MINI_ICON_BUTTON_HEIGHT,
+                padding: 0,
+                borderRadius: 7,
+                border: `1px solid ${backHover ? "var(--control-border-strong)" : "var(--control-border)"}`,
+                background: backHover ? "var(--control-bg-active)" : "var(--control-bg)",
+                color: backHover ? "var(--text-primary)" : "var(--text-secondary)",
+                cursor: "pointer",
+                transition: "background .16s ease, border-color .16s ease, color .16s ease",
+                WebkitAppRegion: "no-drag",
+              }}
+            >
+              <ArrowLeft size={MINI_ICON_SIZE} strokeWidth={MINI_ICON_STROKE_WIDTH} />
+            </button>
+          </div>
+        )}
+
         {/* Main textarea */}
         <textarea
           ref={textareaRef}
